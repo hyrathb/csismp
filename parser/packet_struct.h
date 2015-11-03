@@ -27,6 +27,9 @@ struct slice{
         SYN,
         ERROR
     } type;
+    
+    char smac[6];
+    
     struct
     {
         int start:1;
