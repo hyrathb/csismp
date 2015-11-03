@@ -3,24 +3,24 @@
 
 struct stu_full
 {
-    enum
+    enum S_TYPE
     {
         ID,
         NAME,
         ACADEMY
-    }
+    } type;
     char *content;
-    stu_full *next;
-}
+    struct stu_full *next;
+};
 
 struct stu_id
 {
     char *id;
     struct stu_id *next;
-}
+};
 
 struct slice{
-    enum TYPE
+    enum P_TYPE
     {
         ADD,
         DEL,
@@ -38,6 +38,6 @@ struct slice{
     {
         struct stu_full* content;
         struct stu_id *id_content;
-    }
-}
+    };
+};
 #endif
