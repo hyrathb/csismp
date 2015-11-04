@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "packet_struct.h"
 
 struct packet
@@ -8,9 +9,27 @@ struct packet
     struct
     {
         char c_type;
-    }
+        int start:1;
+        int end:1;
+        int slice:22;
+        int session;
+    };
+    union
+    {
+        struct stu_full full_lv[0];
+        struct stu_id id_lv[0];
+    };
     
-}
+};
+#define ntoh_2bytes(buf) ntoh_nbytes(buf, 2, 0)
+#define ntoh_4bytes(buf) ntoh_nbytes(buf, 4, 0)
+#define ntoh_6bytes(buf) ntoh_nbytes(buf, 6, 0)
+#define ntoh_8bytes(buf) ntoh_nbytes(buf, 8, 0)
 
-struct slice * parser(char *buf);
-re_byte
+void swap_byte(unsigned char *b1, unsigned char *b2);
+
+void ntoh_nbytes(unsigned char *buf, size_t len, size_t silly_bits);
+
+void ntoh(unsigned char *dbuf, size_t len);
+
+struct slice * parser(unsigned char *buf, size_t len);
