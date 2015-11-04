@@ -1,6 +1,8 @@
 #ifndef PACKET_H
 #define PACKET_H
 
+#include <sys/time.h>
+
 struct stu_full
 {
     enum S_TYPE
@@ -27,6 +29,8 @@ struct slice{
         SYN,
         ERROR
     } type;
+    
+    time_t timestamp;
     
     char smac[6];
     
