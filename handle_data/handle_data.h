@@ -7,10 +7,10 @@
 
 #define CONFIG_FILE "Config.txt"
 
-typedef struct destination_mac{
+typedef struct mac{
     char* mac_address;
-    struct destination_mac* next;
-}DST_MAC;
+    struct mac* next;
+}MAC;
 
 typedef struct student_info{
     char* faculty;
@@ -87,6 +87,7 @@ typedef struct session
     struct slice* info;
 }SESSION;
 
-int read_config(FILE *config);
+int read_config(FILE *config, MAC** link_mac_address);
+int store_mac_address(char* mac_address, MAC** link_mac_address);
 
 #endif
