@@ -13,19 +13,19 @@ struct packet
         int end:1;
         int slice:22;
         int session;
-    }
+    };
     char tlvs[];
     
-}
-#define ntoh_4bytes(buf) ntoh_nbits(buf, 32)
-#define ntoh_2bytes(buf) ntoh_nbits(buf, 16)
-#define ntoh_6bytes(buf) ntoh_nbits(buf, 24)
-#define ntoh_8bytes(buf) ntoh_nbits(buf, 64)
+};
+#define ntoh_2bytes(buf) ntoh_nbytes(buf, 2, 0)
+#define ntoh_4bytes(buf) ntoh_nbytes(buf, 4, 0)
+#define ntoh_6bytes(buf) ntoh_nbytes(buf, 6, 0)
+#define ntoh_8bytes(buf) ntoh_nbytes(buf, 8, 0)
 
 void swap_byte(unsigned char *b1, unsigned char *b2);
 
-void ntoh_nbits(unsigned char *buf, size_t len);
+void ntoh_nbytes(unsigned char *buf, size_t len, size_t silly_bits);
 
-void ntoh(unsigned char *dbuf, unsigned char *sbuf, size_t len);
+void ntoh(unsigned char *dbuf, size_t len);
 
-struct slice * parser(unsigned char *buf);
+struct slice * parser(unsigned char *buf, size_t len);
