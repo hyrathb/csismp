@@ -14,7 +14,11 @@ struct packet
         int slice:22;
         int session;
     };
-    char tlvs[];
+    union
+    {
+        struct stu_full full_lv[0];
+        struct stu_id id_lv[0];
+    };
     
 };
 #define ntoh_2bytes(buf) ntoh_nbytes(buf, 2, 0)

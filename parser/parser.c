@@ -2,6 +2,7 @@
 #include "parser.h"
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 static const unsigned char rbits[8] = {0x0, 0x1, 0x3, 0x7, 0xf, 0x1f, 0x3f, 0x7f};
 static const unsigned char lbits[8] = {0x0, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe};
@@ -18,7 +19,7 @@ void ntoh_nbytes(unsigned char *dst, size_t n, size_t silly_bits)
     if (n <= 8)
         return;
     unsigned char *h=dst, *t=dst+n-1;
-    unsigned char silly = *h & lbits[silly];
+    unsigned char silly=*h & lbits[silly];
     while (h<t)
     {
         swap_byte(h, t);
@@ -32,7 +33,7 @@ void ntoh_nbytes(unsigned char *dst, size_t n, size_t silly_bits)
         unsigned char left = silly;
         while (h <= t)
         {
-            unsigned char tleft = (*h & rbits[silly_bits]) << (8-silly_bits);
+            unsigned char tleft = (*h & rbits[silly_bits]) << (8 - silly_bits);
             *h>>= silly_bits;
             *h |= left;
             left = tleft;
@@ -67,5 +68,36 @@ struct slice * parser(unsigned char *buf, size_t len)
     memcpy(new_buf, buf, len);
     ntoh(new_buf, len);
     struct packet *p = (void *)new_buf;
+    struct slice *new_slice = malloc(sizeof(struct slice));
     
+    new_slice = ERROR;
+    if (p->pro_type != 0x1122)
+    {
+        free(new_buf);
+        return new_slice;
+    }
+    switch(p->c_type)
+    {
+        case 1:
+        {
+            new_slice->type = ADD;
+            new_slice->timestamp = time(NULL);
+        }
+        case 2:
+        {
+        }
+        case 3:
+        case 4:
+            free(new_buf);
+            free(new_slice);
+            return NULL;
+        case 5:
+        {
+        }
+        default:
+            free(new_buf);
+            return new_slice;
+    }
+    free(new_buf);
+    return new_slice;
 }
