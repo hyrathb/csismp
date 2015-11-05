@@ -93,7 +93,75 @@ int check_tlv(const struct tlv *t, size_t left_len, char type_limit)
 
 int fill_slice_stu_full(struct slice *s, const char *stu, size_t max_len)
 {
-    return 0;
+    s->content = NULL;
+    struct tlv *tlvs = (void *)stu;
+    if (check_tlv(tlvs, max_len, -1))
+        return -1;
+    
+    if (!tlvs->type)
+        return 0;
+    
+    struct stu_full *tmplv = malloc(sizeof(struct stu_full));
+    
+    tmplv->type = tlvs->type - 1;
+    tmplv->len = tlvs->len-1;
+    tmplv->content = malloc(tlvs->len);
+    strcpy(tmplv->content, tlvs->val);
+    tmplv->next = NULL;
+    max_len -= tlvs->len + 2;
+    s->content = tmplv;
+    stu += tlvs->len + 2;
+    
+    int next_type = tlvs->type;
+    
+    while (max_len > 0)
+    {
+        tlvs = (void *)stu;
+        if (next_type == 3)
+            next_type = 1;
+        else
+            ++next_type;
+        
+        if (check_tlv(tlvs, max_len, next_type))
+        {
+            struct stu_full *t1, *t2;
+            for (t1=s->content, t2=t1->next; t2; t1=t2, t2=t2->next)
+            {
+                free(t1->content);
+                free(t1);
+            }
+            free(t1->content);
+            free(t1);
+            s->content =NULL;
+            return -1;
+        }
+        else if (tlvs->type)
+        {
+            struct stu_full *new_lv = malloc(sizeof(struct stu_full));
+            new_lv->type = tlvs->type-1;
+            new_lv->len = tlvs->len-1;
+            new_lv->content = malloc(tlvs->len);
+            strcpy(new_lv->content, tlvs->val);
+            new_lv->next = NULL;
+            max_len -= tlvs->len + 2;
+            tmplv->next = new_lv;
+            tmplv = new_lv;
+            stu += tlvs->len + 2;
+        }
+        else
+            return 0;
+    }
+    
+    struct stu_full *t1, *t2;
+    for (t1=s->content, t2=t1->next; t2; t1=t2, t2=t2->next)
+    {
+        free(t1->content);
+        free(t1);
+    }
+    free(t1->content);
+    free(t1);
+    s->content =NULL;
+    return -1;
 }
 
 int fill_slice_stu_id(struct slice *s, const char *id, size_t max_len)
