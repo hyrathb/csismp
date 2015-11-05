@@ -1,3 +1,6 @@
+#ifndef PARSER_H
+#define PARSER_H
+
 #include <stdlib.h>
 #include "packet_struct.h"
 
@@ -45,3 +48,4 @@ int fill_slice_stu_id(struct slice *s, const char *id, size_t max_len);
 
 /************Don't do anything if it returns NULL************************/
 struct slice * parser(unsigned char *buf, size_t len);
+#endif
