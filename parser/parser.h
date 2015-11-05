@@ -1,6 +1,13 @@
 #include <stdlib.h>
 #include "packet_struct.h"
 
+struct tlv
+{
+    char type;
+    unsigned char len;
+    char val[0];
+}
+
 struct packet
 {
     char smac[6];
@@ -14,11 +21,7 @@ struct packet
         int slice:22;
         int session;
     };
-    union
-    {
-        struct stu_full full_lv[0];
-        struct stu_id id_lv[0];
-    };
+    char tlvs[];
     
 };
 #define ntoh_2bytes(buf) ntoh_nbytes(buf, 2, 0)
@@ -31,5 +34,13 @@ void swap_byte(unsigned char *b1, unsigned char *b2);
 void ntoh_nbytes(unsigned char *buf, size_t len, size_t silly_bits);
 
 void ntoh(unsigned char *dbuf, size_t len);
+
+void fill_slice_common(struct slice *s, const struct packet *p);
+
+int check_field()
+
+int fill_slice_stu_full(stuct slice *s, const struct stu_full *stu);
+
+int fill_slice_stu_id(struct slice *s, const struct stu_id *id);
 
 struct slice * parser(unsigned char *buf, size_t len);
