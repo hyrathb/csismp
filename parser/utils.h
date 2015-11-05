@@ -15,6 +15,8 @@
 #define hton_6bytes(buf) hton_nbytes(buf, 6, 0)
 #define hton_8bytes(buf) hton_nbytes(buf, 8, 0)
 
+#define hton(dbuf, len) ntoh(dbuf, len)
+
 void swap_byte(unsigned char *b1, unsigned char *b2);
 
 void ntoh_nbytes(unsigned char *buf, size_t len, size_t silly_bits);

@@ -21,8 +21,9 @@
 #include <linux/in.h>
 
 #include <stdint.h>
-#include <net/if.h>
 */
+#include <net/if.h>
+#include <netpacket/packet.h>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -34,6 +35,7 @@
 //#include <linux/in.h>
 
 #include <event.h>
+#include <event2/event.h>
 #include <pthread.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -116,7 +118,7 @@ int main(int argc, char **argv[])
     /**********************************/
     struct event_base *base = event_base_new();
     struct event *listen_event;
-    listen_event = event_new(base, listen_socket, EV_HEAD|EV_PERSIST, p_read_callback, struct config);
+    listen_event = event_new(base, listen_socket, EV_READ|EV_PERSIST, p_read_callback, &rsync_info);
     event_add(listen_event, NULL);
 
     pthread_t sync_tid;
@@ -157,7 +159,7 @@ void sync_thread(void *arg){
         exit(1);
     }*/
 
-    event_set(&sync_ev, send_socket, EV_PERSIST, p_sync_callback, struct rsync_info *rsync_info);
+    event_set(&sync_ev, send_socket, EV_PERSIST, p_sync_callback, &rsync_info);
     event_base_set(base, &sync_ev);
     event_add(&sync_ev, &timer);
     event_base_loop(base, 0);
@@ -173,10 +175,8 @@ void set_mac(char *setto, char *from){
 
 void read_thread(char buffer[]){
     int i;
-    eth = (struct ethhdr*)buffer;
-
-    char *dmac = (char *)malloc(len(char) * 6);
-    char *smac = (char *)malloc(len(char) * 6);
+    char *dmac = (char *)malloc(sizeof(char) * 7);
+    char *smac = (char *)malloc(sizeof(char) * 7);
     for ( i = 0 ; i < 6; ++i )
     {
         dmac[i] = (unsigned char)buffer[i];
@@ -184,7 +184,7 @@ void read_thread(char buffer[]){
     }
     dmac[++i] = '\0'; smac[++i] ='\0';
 
-    char *eth_type = ((unsigned char)buffer[13])*16*16 + (unsigned char)buffer[14];
+    uint16_t eth_type = ((uint16_t)buffer[13]) << 8 | (uint16_t)buffer[14];
     if (eth_type == 0x1122 /*&& is_corrent_mac(smac, dmac) */){
 
         printf("-TO HYR TO HYR!-");
@@ -221,12 +221,13 @@ int p_read_callback(int sock, short event, void *arg){
     char buffer[BUFFER_MAX];
     struct ethhdr *eth;
 
-    n_read = recvfrom(sock, buffer, BUFFER_MAX, 0, NULL, NULL);
+    int n_read = recvfrom(sock, buffer, BUFFER_MAX, 0, NULL, NULL);
 
 
     printf("-RECIVED-\n");
-    char *eth_type = ((unsigned char)buffer[16])*16*16 + (unsigned char)buffer[17];
+    uint16_t eth_type = ((uint16_t)buffer[16]) << 8 | (uint16_t)buffer[17];
     if (eth_type == 0x1122){
+        int i;
         for ( i=0 ; i<n_read ; i++)
             printf("%.2X ",(unsigned char)buffer[i]);
             if(((i+1)%16)==0) printf("\n");
@@ -234,7 +235,7 @@ int p_read_callback(int sock, short event, void *arg){
     printf("\n-END-\n");
 
     pthread_t sync_tid;
-    pthread_create(&read_thread, NULL, read_thread, buffer);
+    pthread_create(&sync_tid, NULL, (void * (*)(void *))&read_thread, buffer);
 }
 
 
@@ -264,15 +265,15 @@ int p_reply(char dest_addr[6], int type){
     struct ifreq ifr;
 
     strcpy(ifr.ifr_name, "eth0");
-    octl(sockfd, SIOCGIFINDEX, &ifr);
+    ioctl(send_socket, SIOCGIFINDEX, &ifr);
 
 
     struct sockaddr_ll sll;
     memset(&sll, 0, sizeof(struct sockaddr_ll));
     sll.sll_family = PF_PACKET;
     sll.sll_ifindex = ifr.ifr_ifindex;
-    sll.sll_protocol = htons(ETH_P_APLL);
-    if(bind(send_socket, &addr, sizeof(addr)) < 0)
+    sll.sll_protocol = htons(ETH_P_ALL);
+    if(bind(send_socket, (struct sockaddr *)&sll, sizeof(struct sockaddr_ll)) < 0)
     {
         perror("send bind error");
         exit(1);
@@ -302,29 +303,29 @@ char* csismp_construct(
         int session,
         const char* s_tlvs)
 {
-    struct packet *csismp;
+    struct packet *csismp = malloc(sizeof(struct packet));
 
-    set_mac(csismp.smac, dest_addr);
-    set_mac(csismp.dmac, //sendmac);
+    set_mac(csismp->smac, source_addr);
+    set_mac(csismp->dmac, dest_addr);
 
-    csismp.pro_type = htons(0x1122);
-    csismp.c_type = type;
+    csismp->pro_type = htons(0x1122);
+    csismp->c_type = c_type;
 
-    csismp.start = start;
-    csismp.end = end;
-    csismp.slice = slice;
-    csismp.session = session;
-    strcpy(cssismp.tlvs, s_tlvs);
+    csismp->start = start;
+    csismp->end = end;
+    csismp->slice = slice;
+    csismp->session = session;
+    strcpy(csismp->tlvs, s_tlvs);
 
-    return cssismp;
+    return (char *)csismp;
 }
 
 
 int _csismp_send(int send_socket, const char *buffer){
-    sendto(send_socket, buffer, len(buffer), 0, &addr, addr_len);//!
+    sendto(send_socket, buffer, strlen(buffer), 0);//!
 }
 
-int csismp_send(int send_socket, char dest_addr[6], int type, int tlvs){
+int csismp_send(int send_socket, char dest_addr[6], int type, char* tlvs){
     char *s_tlvs = tlvs; //!
     int s_len = len(s_tlvs);
     char *buffer;
@@ -337,7 +338,7 @@ int csismp_send(int send_socket, char dest_addr[6], int type, int tlvs){
     if (type == 3 || type == 4)
     {
         //rand int <1000 return randint1000
-        buffer = csismp_construct(sourc_addr, dest_addr,
+        buffer = csismp_construct(rsync_info.local_mac, dest_addr,
                             type, 1, 1, 1, session, NULL);
         _csismp_send(send_socket, buffer);
     }
