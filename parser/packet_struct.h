@@ -1,7 +1,7 @@
 #ifndef PACKET_H
 #define PACKET_H
 
-#include <sys/time.h>
+#include <time.h>
 
 struct stu_full
 {

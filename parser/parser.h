@@ -6,7 +6,7 @@ struct tlv
     char type;
     unsigned char len;
     char val[0];
-}
+};
 
 struct packet
 {
@@ -37,10 +37,10 @@ void ntoh(unsigned char *dbuf, size_t len);
 
 void fill_slice_common(struct slice *s, const struct packet *p);
 
-int check_field()
+int check_tlv(const struct tlv *t, size_t left_len, char type_limit);
 
-int fill_slice_stu_full(stuct slice *s, const struct stu_full *stu);
+int fill_slice_stu_full(struct slice *s, const char *stu, size_t max_len);
 
-int fill_slice_stu_id(struct slice *s, const struct stu_id *id);
+int fill_slice_stu_id(struct slice *s, const char *id, size_t max_len);
 
 struct slice * parser(unsigned char *buf, size_t len);
