@@ -3,7 +3,6 @@
 
 int main(void)
 {
-    //printf("hello world!\n");
     FILE *config;
     char config_file_path[]=CONFIG_FILE;
     if(!(config = fopen(config_file_path,"r")))
@@ -12,15 +11,12 @@ int main(void)
         exit(-1);
     }
 
-    MAC *head,*mac_p;
-    mac_p = (MAC*)malloc(sizeof(*mac_p));
-    head = mac_p;
-    mac_p->next = NULL;
-    mac_p = mac_p->next;
-    MAC **mac_p_head;
-    *mac_p_head = mac_p;
+    MAC* mac_p = (MAC*)malloc(sizeof(MAC));
+    MAC* head = mac_p;
+    head->next = NULL;
+    mac_p = head;
 
-    if(!read_config(config,mac_p_head))
+    if(!read_config(config,&mac_p))
     {
         printf("error while reading config\n");
         exit(-1);
@@ -87,15 +83,15 @@ int read_config(FILE* config,MAC** link_mac_address)//todo:deal with wrong input
 int store_mac_address(char* mac_address, MAC** link_mac_address)
 {
     int address_length = strlen(mac_address);
-    MAC* tmp_p = NULL;
-    while((*link_mac_address)!=NULL)
-        (*link_mac_address) = (*link_mac_address)->next;
+    MAC* tmp_p = *link_mac_address;
+    while(tmp_p!=NULL)
+        tmp_p = tmp_p->next;
     //this step tmp_p is NULL
-    tmp_p = (MAC*)malloc(sizeof(*tmp_p));
+    tmp_p = (MAC*)malloc(sizeof(MAC));
     tmp_p->mac_address = (char*)malloc(address_length);
     strcpy(tmp_p->mac_address,mac_address);
-    tmp_p->next = *link_mac_address;
-    *link_mac_address=tmp_p;
+    (*link_mac_address)->next = tmp_p;
+    *link_mac_address=(*link_mac_address)->next;
     return 1;
 }
 
