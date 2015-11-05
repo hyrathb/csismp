@@ -1,7 +1,7 @@
 #ifndef PACKET_H
 #define PACKET_H
 
-#include <sys/time.h>
+#include <time.h>
 
 struct stu_full
 {
@@ -11,12 +11,14 @@ struct stu_full
         NAME,
         ACADEMY
     } type;
+    unsigned char len;
     char *content;
     struct stu_full *next;
 };
 
 struct stu_id
 {
+    unsigned char len;
     char *id;
     struct stu_id *next;
 };

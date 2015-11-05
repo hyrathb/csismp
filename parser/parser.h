@@ -1,5 +1,15 @@
+#ifndef PARSER_H
+#define PARSER_H
+
 #include <stdlib.h>
 #include "packet_struct.h"
+
+struct tlv
+{
+    char type;
+    unsigned char len;
+    char val[0];
+};
 
 struct packet
 {
@@ -14,11 +24,7 @@ struct packet
         int slice:22;
         int session;
     };
-    union
-    {
-        struct stu_full full_lv[0];
-        struct stu_id id_lv[0];
-    };
+    char tlvs[];
     
 };
 #define ntoh_2bytes(buf) ntoh_nbytes(buf, 2, 0)
@@ -32,4 +38,14 @@ void ntoh_nbytes(unsigned char *buf, size_t len, size_t silly_bits);
 
 void ntoh(unsigned char *dbuf, size_t len);
 
+void fill_slice_common(struct slice *s, const struct packet *p);
+
+int check_tlv(const struct tlv *t, size_t left_len, char type_limit);
+
+int fill_slice_stu_full(struct slice *s, const char *stu, size_t max_len);
+
+int fill_slice_stu_id(struct slice *s, const char *id, size_t max_len);
+
+/************Don't do anything if it returns NULL************************/
 struct slice * parser(unsigned char *buf, size_t len);
+#endif
