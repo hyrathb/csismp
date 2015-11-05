@@ -1,6 +1,6 @@
 #include "packet_struct.h"
 #include "parser.h"
-#include "utils.h"
+#include "../utils.h"
 
 #include <stdlib.h>
 #include <string.h>
