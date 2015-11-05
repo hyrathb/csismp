@@ -18,6 +18,13 @@
 #include <pthread.h>
 #include <pcap.h>
 
+struct rsync_info{
+    char *conifg_mac;
+    char *local_mac;
+    int mac_num;
+    char *listen_mac;
+    char tlvs;
+}rsync_info;
 
 
 
