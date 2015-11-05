@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #define CONFIG_FILE "Config.txt"
+#define DATA_FILE "StuInfo.txt"
 
 typedef struct mac{
     char* mac_address;
@@ -53,7 +55,7 @@ struct stu_id
  *the data passing format
  *
  */
-struct slice{
+typedef struct slice{
     enum P_TYPE
     {
         ADD,
@@ -78,16 +80,19 @@ struct slice{
         struct stu_full* content;
         struct stu_id *id_content;
     };
-};
+}SLICE;
 
 typedef struct session
 {
     int id;
+    time_t first_time;
     struct session* next;
     struct slice* info;
 }SESSION;
 
 int read_config(FILE *config, MAC** link_mac_address);
 int store_mac_address(char* mac_address, MAC** link_mac_address);
-
+int if_dst_mac_address(char* compare_list, MAC* mac_head);
+int is_time_expire(time_t fist_package_time,time_t current_package_time);
+int read_data_file(FILE* data_file,STUDENT_INFO** link_mac_address);
 #endif
