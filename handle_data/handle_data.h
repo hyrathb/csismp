@@ -95,4 +95,8 @@ int store_mac_address(char* mac_address, MAC** link_mac_address);
 int if_dst_mac_address(char* compare_list, MAC* mac_head);
 int is_time_expire(time_t fist_package_time,time_t current_package_time);
 int read_data_file(FILE* data_file,STUDENT_INFO** link_mac_address);
+char* join(char* string1,char* string2);
+int store_student_info(char* faculty, char* student_id, char* student_name,STUDENT_INFO** link_student_info);
+SESSION* which_session_to_go(SLICE* package,SESSION* session_func_head);
+char* mac_address_format_convert(char* config_format);
 #endif
