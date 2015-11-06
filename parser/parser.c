@@ -12,7 +12,6 @@ void fill_slice_common(struct slice *s, const struct packet *p)
 {
     s->timestamp = time(NULL);
     memcpy(s->smac, p->smac, 6);
-    s->smac[6] = 0;
     s->start = p->start;
     s->end = p->end;
     s->sli_num = p->slice;

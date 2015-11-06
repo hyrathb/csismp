@@ -13,8 +13,8 @@ struct tlv
 
 struct packet
 {
-    char smac[6];
-    char dmac[6];
+    unsigned char smac[6];
+    unsigned char dmac[6];
     short pro_type;
     struct
     {

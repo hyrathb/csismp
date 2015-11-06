@@ -34,7 +34,7 @@ struct slice{
     
     time_t timestamp;
     
-    char smac[6];
+    unsigned char smac[6];
     
     struct
     {
