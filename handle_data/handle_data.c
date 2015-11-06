@@ -72,6 +72,8 @@ int main(void)
     SESSION* session_p = session_head;
 
 
+
+
     return 0;
 }
 
@@ -250,7 +252,31 @@ char* join(char* string1,char* string2)
  
 int slice_handle(SLICE package,SESSION** data_session)
 {
+    SESSION *p_session = *data_session;
+    while(p_session!=NULL)
+    {
+        if (is_time_expire(p_session->first_time,package.timestamp))
+        {
+            handle_session(&p_session);
+            return 0;
+        }
+        else if (p_session->id == package.session&&!strcmp(p_session->mac_address,package.smac))
+        {
+            append_slice_to_session(&p_session,package);
+            return 1;
+        }
+        p_session = p_session->next;
+    }
+    return 0;
+}
 
+int append_slice_to_session(SESSION** current_node,SLICE package)
+{
+    return 1;
+}
+
+int handle_session(SESSION** current_node)
+{
     return 1;
 }
 
