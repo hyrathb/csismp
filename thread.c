@@ -1,5 +1,5 @@
-#include "async.h"
-
+#include "thread.h"
+#include "utils.h"
 
 typedef struct mac{
     char* mac_address;
@@ -14,7 +14,6 @@ typedef struct student_info{
 }STUDENT_INFO;
 
 MAC config_mac;
-
 
 
 int _csismp_send(int send_socket, const char *buffer, int len);
@@ -140,32 +139,10 @@ void read_thread(void *arg){
         //TO HYR
         printf("- REALLY TO HYR TO HYR!-");
     }
-
     printf("-TO HYR TO HYR!-");
 }
 
-char *format_mac(char *mac){  // "FF-FF-FF-FF-FF-FF" or "FFFFFFFFFFFF" to char[7]
-    int j;
-    char *format_mac = malloc(sizeof(char) * 7);
-    if (mac[3] == '-')
-        for( j = 0 ;  mac[j]!='\0' && j < 18 ; j += 3 )
-            format_mac[j] = ( (uint64_t)(mac[j] - 'a') ? mac[j] - 'a' +10 : mac[j] - '0' ) << 8 |
-                                    ( (uint64_t)(mac[j+1] - 'a') ? mac[j+1] - 'a' +10 : mac[j+1] - '0' );
 
-    else
-        for( j = 0 ;  mac[j]!='\0' && j < 13 ; j += 2 )
-            format_mac[j] = ( (uint64_t)(mac[j] - 'a') ? mac[j] - 'a' +10 : mac[j] - '0' ) << 8 |
-                                    ( (uint64_t)(mac[j+1] - 'a') ? mac[j+1] - 'a' +10 : mac[j+1] - '0' );
-
-    format_mac[6] = '\0';
-    return format_mac;
-}
-
-uint64_t transform_mac_to_int64(char *mac){ //char[7] to 0xFFFFFFFFFFFF
-    uint64_t smac = (uint64_t) mac[0]<<40 |(uint64_t) mac[1] <<32|(uint64_t) mac[3]<<24|
-                        (uint64_t)mac[4] <<16|(uint64_t) mac[5] <<8|(uint64_t) mac[6];
-    return smac;
-}
 
 /******************************/
 
@@ -222,6 +199,7 @@ void p_reply(char dest_addr[6], int type){
     csismp_send(reply_socket, dest_addr, type, NULL, 0);//!
     close(reply_socket);
 }
+
 
 /******************************************/
 char* csismp_construct(
@@ -324,30 +302,4 @@ int csismp_send(int send_socket, char dest_addr[6], int type, char* tlvs, int s_
             s_tlvs -= 1024;
         }
     }
-}
-
-char *get_interface_name(){
-    struct ifaddrs *ifa = NULL, *ifList;
-    char *interface_name = malloc(sizeof(char) * 12);
-    interface_name[0] = '\0';
-
-    if (getifaddrs(&ifList) < 0)
-    {
-        return NULL;
-    }
-
-    for (ifa = ifList; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        if(ifa->ifa_addr->sa_family == AF_INET)
-        {
-            if (strlen(interface_name) == 0)
-                strcpy(interface_name, ifa->ifa_name);
-            else
-                if (strcmp(interface_name, ifa->ifa_name) > 0)
-                    strcpy(interface_name, ifa->ifa_name);
-        }
-    }
-
-    freeifaddrs(ifList);
-    return interface_name;
 }

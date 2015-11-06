@@ -22,4 +22,17 @@ void swap_byte(unsigned char *b1, unsigned char *b2);
 void ntoh_nbytes(unsigned char *buf, size_t len, size_t silly_bits);
 
 void ntoh(unsigned char *dbuf, size_t len);
+
+char *get_interface_name();
+
+char *format_mac(char *mac);
+
+uint64_t transform_mac_to_int64(char *mac);
+
+char* mac_upper(const char *str);
+
+char *format(char *mac);
+
+uint64_t transform_mac_to_int64(char *smac);
+
 #endif
