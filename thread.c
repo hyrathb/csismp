@@ -142,8 +142,6 @@ void read_thread(void *arg){
     printf("-TO HYR TO HYR!-");
 }
 
-
-
 /******************************/
 
 void p_read_callback(int sock, short event, void *arg){
@@ -166,7 +164,6 @@ void p_read_callback(int sock, short event, void *arg){
     pthread_t sync_tid;
     pthread_create(&sync_tid, NULL, (void * (*)(void *))&read_thread, buffer_arg);
 }
-
 
 int generate_tlvs(void *);
 
@@ -200,7 +197,6 @@ void p_reply(char dest_addr[6], int type){
     close(reply_socket);
 }
 
-
 /******************************************/
 char* csismp_construct(
         char source_addr[6],
@@ -224,7 +220,7 @@ char* csismp_construct(
     csismp->start = start;
     csismp->end = end;
     csismp->slice = slice;
-    csismp->session = session;
+    csismp->session = hton_4bytes(session);
     strncpy(csismp->tlvs, s_tlvs, len);
 
     return (char*)csismp;
