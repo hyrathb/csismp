@@ -266,6 +266,10 @@ int slice_handle(SLICE package,SESSION** data_session,STUDENT_INFO** link_studen
         }
         p_session = p_session->next;
     }
+    if (judge_return == 0)
+    {
+        create_session_and_add_slice(data_session,package,package.type);
+    }
     return 0;
 }
 
@@ -417,6 +421,32 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info)
             return 1;
         }
     }
+}
+
+int create_session_and_add_slice(SESSION** current_node,SLICE package,enum  P_TYPE type)
+{
+    SESSION* ses_tmp = *current_node;
+    while(ses_tmp!=NULL)
+        ses_tmp = ses_tmp->next;
+    ses_tmp = (SESSION*)malloc(sizeof(*ses_tmp));
+    ses_tmp->id = package.session;
+    ses_tmp->type = type;
+    ses_tmp->first_time = package.timestamp;
+    strcpy(ses_tmp->mac_address,package.smac);
+    ses_tmp->next = NULL;
+    ses_tmp->member = (MEMBER*)malloc(sizeof(MEMBER));
+    ses_tmp->member->sli_num = package.sli_num;
+    if (type == DEL)
+    {       
+        ses_tmp->member->id_content = package.id_content;
+    }
+    else
+        ses_tmp->member->content = package.content;
+    ses_tmp->member->next = NULL;
+
+    (*current_node)->next = ses_tmp;
+    *current_node = (*current_node)->next;
+    return 1;
 }
 
 char* mac_address_format_convert(char* config_format)

@@ -118,4 +118,5 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info);
 int free_session(SESSION**current_node);
 int store_session_into_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,enum P_TYPE type);
 int slice_handle(SLICE package,SESSION** data_session,STUDENT_INFO** link_student_info);
+int create_session_and_add_slice(SESSION** current_node,SLICE package,enum  P_TYPE type);
 #endif
