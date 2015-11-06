@@ -111,7 +111,7 @@ char *format(char *mac){  // "FF-FF-FF-FF-FF-FF" or "FFFFFFFFFFFF" to unsigned c
     return format_mac;
 }
 
-uint64_t transform_mac_to_int64(char *mac){ //char[6] to 0xFFFFFFFFFFFF
+uint64_t transform_mac_to_int64(unsigned char *mac){ //char[6] to 0xFFFFFFFFFFFF
     uint64_t smac = (uint64_t) (unsigned char)mac[0]<<40 |(uint64_t) (unsigned char)mac[1] <<32|(uint64_t) (unsigned char)mac[2]<<24|
                         (uint64_t) (unsigned char)mac[3] <<16|(uint64_t) (unsigned char)mac[4] <<8|(uint64_t) (unsigned char)mac[5];
     return smac;
