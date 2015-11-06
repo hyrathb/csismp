@@ -68,7 +68,6 @@ int main(void)
     //todo:init func
     SESSION* session_head = (SESSION*)malloc(sizeof(*session_head));
     session_head->next = NULL;
-    session_head->info = NULL;
     SESSION* session_p = session_head;
 
 
@@ -250,34 +249,174 @@ char* join(char* string1,char* string2)
  *sync
  */
  
-int slice_handle(SLICE package,SESSION** data_session)
+int slice_handle(SLICE package,SESSION** data_session,STUDENT_INFO** link_student_info)
 {
     SESSION *p_session = *data_session;
+    int judge_return = 0;
     while(p_session!=NULL)
     {
         if (is_time_expire(p_session->first_time,package.timestamp))
         {
-            handle_session(&p_session);
-            return 0;
+            handle_session(&p_session,link_student_info);
         }
-        else if (p_session->id == package.session&&!strcmp(p_session->mac_address,package.smac))
+        else if (p_session->id == package.session&&p_session->type == package.type&&!strcmp(p_session->mac_address,package.smac))
         {
-            append_slice_to_session(&p_session,package);
-            return 1;
+            append_slice_to_session(&p_session,package,package.type);
+            judge_return = 1;
         }
         p_session = p_session->next;
     }
     return 0;
 }
 
-int append_slice_to_session(SESSION** current_node,SLICE package)
+int append_slice_to_session(SESSION** current_node,SLICE package,enum  P_TYPE type)
 {
-    return 1;
+    MEMBER* member_head = (*current_node)->member;
+    if (package.start == 1)                     //append,maybe nodes live!
+    {
+        package.sli_num = 0;
+    }
+    else if (package.end == 1)
+    {
+        package.sli_num == -1;
+    }
+    if (type == DEL)
+    {
+        //struct stu_id* stu_id_head = member_head->id_content;
+        int state;
+        while(member_head!=NULL)
+        {
+            if (package.sli_num>member_head->sli_num)
+            {
+                member_head = member_head->next;
+            }
+            else
+            {
+                MEMBER* member_tmp = (MEMBER*)malloc(sizeof(*member_tmp));
+                member_tmp->id_content = package.id_content;
+                member_tmp->sli_num = package.sli_num;
+                member_tmp->next = member_head;
+                member_head = member_tmp;
+                state = 1;
+            }
+        }
+        if (state != 1)
+        {
+            MEMBER* member_tmp = (MEMBER*)malloc(sizeof(*member_tmp));
+            member_tmp->id_content = package.id_content;
+            member_tmp->sli_num = package.sli_num;
+            member_tmp->next = NULL;
+            member_head = member_tmp;
+        }
+        return 1;
+    }
+    else
+    {
+        int state;
+        while(member_head!=NULL)
+        {
+            if (package.sli_num>member_head->sli_num)
+            {
+                member_head = member_head->next;
+            }
+            else
+            {
+                MEMBER* member_tmp = (MEMBER*)malloc(sizeof(*member_tmp));
+                member_tmp->content = package.content;
+                member_tmp->sli_num = package.sli_num;
+                member_tmp->next = member_head;
+                member_head = member_tmp;
+                state = 1;
+            }
+        }
+        if (state != 1)
+        {
+            MEMBER* member_tmp = (MEMBER*)malloc(sizeof(*member_tmp));
+            member_tmp->content = package.content;
+            member_tmp->sli_num = package.sli_num;
+            member_tmp->next = NULL;
+            member_head = member_tmp;
+        }
+        return 1;
+    }
+    
 }
 
-int handle_session(SESSION** current_node)
+int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info)
 {
-    return 1;
+    SESSION* session_head = *current_node;
+    MEMBER* member_head = session_head->member;
+    if (session_head->type == DEL)
+    {
+        if (member_head->sli_num!=-1) //maybe there's one
+        {
+            MEMBER* tmp = member_head->next;
+            if (tmp!=NULL)
+            {
+                printf("this session is nonsense!\n");
+                free_session(current_node);
+                return 0;
+            }
+            else
+            {
+                store_session_into_student_info(current_node,link_student_info,DEL);
+                free_session(current_node);
+                return 1;
+            }
+        }
+        else
+        {
+            int start = -1;
+            while(member_head!=NULL)
+            {
+                if (member_head->sli_num == start)
+                {
+                    member_head = member_head->next;
+                    start++;
+                }
+                else
+                {
+                    printf("this session is nonsense!\n");
+                    free_session(current_node);
+                    return 0;
+                }
+            }
+            store_session_into_student_info(current_node,link_student_info,DEL);
+            free_session(current_node);
+            return 1;
+        }
+
+    }
+    else
+    {
+        if (member_head->sli_num!=-1) //maybe there's one
+        {
+            printf("this session is nonsense!\n");
+            free_session(current_node);
+            return 0;
+        }
+        else
+        {
+            int start = -1;
+            while(member_head!=NULL)
+            {
+                if (member_head->sli_num == start)
+                {
+                    member_head = member_head->next;
+                    start++;
+                }
+                else
+                {
+                    printf("this session is nonsense!\n");
+                    free_session(current_node);
+                    return 0;
+                }
+            }
+            store_session_into_student_info(current_node,link_student_info,session_head->type);
+            free_session(current_node);
+            return 1;
+        }
+    }
 }
 
 char* mac_address_format_convert(char* config_format)
@@ -285,6 +424,17 @@ char* mac_address_format_convert(char* config_format)
     int a = strtoul(config_format,0,16);
     printf("mac_address_format_convert is %d\n",a );
 }
+
+int free_session(SESSION**current_node)
+{
+    return 1;
+}
+
+int store_session_into_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,enum P_TYPE type)
+{
+    return 1;
+}
+
 /*
 int add_in_file()
 {

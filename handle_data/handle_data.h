@@ -83,13 +83,25 @@ typedef struct slice{
     };
 }SLICE;
 
+typedef struct member
+{
+    int sli_num;
+    struct member* next;
+    union
+    {
+        struct stu_full* content;
+        struct stu_id *id_content;
+    };   
+}MEMBER;
+
 typedef struct session
 {
     int id;
+    enum P_TYPE type;
     time_t first_time;
     char mac_address[6];
     struct session* next;
-    struct slice* info;
+    struct member* member;
 }SESSION;
 
 int read_config(FILE *config, MAC** link_mac_address);
@@ -101,6 +113,9 @@ char* join(char* string1,char* string2);
 int store_student_info(char* faculty, char* student_id, char* student_name,STUDENT_INFO** link_student_info);
 SESSION* which_session_to_go(SLICE* package,SESSION* session_func_head);
 char* mac_address_format_convert(char* config_format);
-int append_slice_to_session(SESSION** current_node,SLICE package);
-int append_slice_to_session(SESSION** current_node,SLICE package);
+int append_slice_to_session(SESSION** current_node,SLICE package,enum  P_TYPE type);
+int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info);
+int free_session(SESSION**current_node);
+int store_session_into_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,enum P_TYPE type);
+int slice_handle(SLICE package,SESSION** data_session,STUDENT_INFO** link_student_info);
 #endif
