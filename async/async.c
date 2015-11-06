@@ -1,5 +1,22 @@
 #include "async.h"
 
+
+typedef struct mac{
+    char* mac_address;
+    struct mac* next;
+}MAC;
+
+typedef struct student_info{
+    char* faculty;
+    char* id;
+    char* name;
+    struct student_info* next;
+}STUDENT_INFO;
+
+MAC config_mac;
+
+
+
 int _csismp_send(int send_socket, const char *buffer, int len);
 
 int main(int argc, char **argv[])
@@ -25,6 +42,8 @@ int main(int argc, char **argv[])
     char *a = get_interface_name();
     printf("%s", a);*/
 
+
+    //strcpy(ifr.ifr_name, get_interface_name());
     strcpy(ifr.ifr_name, "enp4s0f1");
 
     if (ioctl(listen_socket, SIOCGIFINDEX, &ifr) == -1) {
@@ -84,7 +103,6 @@ int main(int argc, char **argv[])
     event_base_dispatch(base);
 }
 
-
 void *sync_thread(void *arg){
     struct event_base *base = event_base_new();
     struct timeval timer={.tv_sec = 30, .tv_usec = 0};
@@ -97,7 +115,7 @@ void *sync_thread(void *arg){
         exit(-1);
     }
 
-    event_set(&sync_ev, send_socket, EV_PERSIST, p_sync_callback, &rsync_info);
+    event_set(&sync_ev, send_socket, EV_PERSIST, p_sync_callback, &rsync_info);//!
     event_base_set(base, &sync_ev);
     event_add(&sync_ev, &timer);
 
@@ -107,57 +125,46 @@ void *sync_thread(void *arg){
 
 
 /*******************************/
-void set_mac(char *setto, char *from){
-    int i;
-    for( i = 0 ; i < 6; ++i )
-    {
-        setto[i] = from[i];
-    }
-}
-
 void read_thread(void *arg){
     struct read_callback_buffer *buffer_arg = (struct read_callback_buffer *)arg;
 
-    int i;
-    char *dmac = (char *)malloc(sizeof(char) * 7);
-    char *smac = (char *)malloc(sizeof(char) * 7);
-    for ( i = 0 ; i < 6; ++i )
-    {
-        dmac[i] = (unsigned char)buffer_arg->buffer[i];
-        smac[i] = (unsigned char)buffer_arg->buffer[i+6];
-    }
-    dmac[++i] = '\0'; smac[++i] ='\0';
+    uint64_t smac = transform_mac_to_int64((char *) (buffer_arg->buffer + 6) );
+    uint16_t eth_type = ((uint16_t)buffer_arg->buffer[12]) << 8 | (uint16_t)buffer_arg->buffer[13];
 
-    uint16_t eth_type = ((uint16_t)buffer_arg->buffer[13]) << 8 | (uint16_t)buffer_arg->buffer[14];
-    if (eth_type == 0x1122 /*&& is_corrent_mac(smac, dmac) */){
-
-        //to hyr
+    if (eth_type == 0x1122 && smac == transform_mac_to_int64(config_mac.mac_address) ){
+/*      int i;
+        for ( i=0 ; i<len ; i++){
+            printf("%.2X ",(unsigned char)buffer[i]);
+            if(((i+1)%16)==0) printf("\n");
+*/
+        //TO HYR
+        printf("- REALLY TO HYR TO HYR!-");
     }
+
     printf("-TO HYR TO HYR!-");
-
-
 }
 
-int is_corrent_mac(char *dmac, char *smac)
-{
-    char mac[7];
-    int i;
-    int flag = 0;
-    if( !( strcmp(rsync_info.conifg_mac, dmac) != 0 && strcmp(rsync_info.local_mac, dmac) != 0 ) )
-        return 0;
-    for( i = 0 ; i < rsync_info.mac_num ; ++i )
-    {
-        strncpy(mac, rsync_info.listen_mac + 6 * i, 6);
-        if (strcmp(smac, mac) == 0)
-        {
-            flag = 1;
-            break;
-        }
-    }
-    if (flag == 1)
-        return 1;
+char *format_mac(char *mac){  // "FF-FF-FF-FF-FF-FF" or "FFFFFFFFFFFF" to char[7]
+    int j;
+    char *format_mac = malloc(sizeof(char) * 7);
+    if (mac[3] == '-')
+        for( j = 0 ;  mac[j]!='\0' && j < 18 ; j += 3 )
+            format_mac[j] = ( (uint64_t)(mac[j] - 'a') ? mac[j] - 'a' +10 : mac[j] - '0' ) << 8 |
+                                    ( (uint64_t)(mac[j+1] - 'a') ? mac[j+1] - 'a' +10 : mac[j+1] - '0' );
+
     else
-        return 0;
+        for( j = 0 ;  mac[j]!='\0' && j < 13 ; j += 2 )
+            format_mac[j] = ( (uint64_t)(mac[j] - 'a') ? mac[j] - 'a' +10 : mac[j] - '0' ) << 8 |
+                                    ( (uint64_t)(mac[j+1] - 'a') ? mac[j+1] - 'a' +10 : mac[j+1] - '0' );
+
+    format_mac[6] = '\0';
+    return format_mac;
+}
+
+uint64_t transform_mac_to_int64(char *mac){ //char[7] to 0xFFFFFFFFFFFF
+    uint64_t smac = (uint64_t) mac[0]<<40 |(uint64_t) mac[1] <<32|(uint64_t) mac[3]<<24|
+                        (uint64_t)mac[4] <<16|(uint64_t) mac[5] <<8|(uint64_t) mac[6];
+    return smac;
 }
 
 /******************************/
@@ -175,50 +182,32 @@ void p_read_callback(int sock, short event, void *arg){
     if(len < 23)
         return;
 
-    uint16_t eth_type = ((uint16_t)buffer[12]) << 8 | (uint16_t)buffer[13];
-
-
-    if (eth_type == 0x0800){
-        int i;
-        for ( i=0 ; i<len ; i++){
-            printf("%.2X ",(unsigned char)buffer[i]);
-            if(((i+1)%16)==0) printf("\n");
-        }
-    }
-
-
-
-
     struct read_callback_buffer *buffer_arg = malloc(sizeof(struct read_callback_buffer));
     strncpy(buffer_arg->buffer, buffer, len);
     buffer_arg->len = len;
 
     pthread_t sync_tid;
     pthread_create(&sync_tid, NULL, (void * (*)(void *))&read_thread, buffer_arg);
-
-    printf("\n-END PACKET-\n");
-
 }
 
 
+int generate_tlvs(void *);
+
+//!
 void p_sync_callback(int send_socket, short event, void *arg){
     fprintf(stdout, "- A SYNC START -\n");
-    struct rsync_info *_rsync_info = arg;
 
-/*
-    int mac_num = _rsync_info->mac_num;
-    char *mac = _rsync_info->listen_mac;
-    char dest_addr[6];
-    int len = _rsync_info->len;
+    //MAC *mac = &;
+    char buffer[BUFFER_MAX * 8];
+    int len = generate_tlvs(&buffer);
 
-    for ( ; mac_num > 0 ; --mac_num )
+    MAC *dmac = config_mac.next;
+
+    for ( ; dmac != NULL ; dmac = dmac->next)
     {
-        strncpy(dest_addr, mac, 6);
-        csismp_send(send_socket, dest_addr, 5, &_rsync_info->tlvs, len);
-        mac += 6;
+        csismp_send(send_socket, dmac->mac_address, 5, buffer, len);//!
     }
-*///!
-
+//!
     fprintf(stdout, "- A SYNC END -\n");
 }
 
@@ -230,12 +219,11 @@ void p_reply(char dest_addr[6], int type){
         exit(-1);
     }
 
-    csismp_send(reply_socket, dest_addr, type, NULL, 0);
+    csismp_send(reply_socket, dest_addr, type, NULL, 0);//!
     close(reply_socket);
 }
 
 /******************************************/
-
 char* csismp_construct(
         char source_addr[6],
         char dest_addr[6],
@@ -249,8 +237,8 @@ char* csismp_construct(
 {
     struct packet *csismp = malloc(sizeof(struct packet));
 
-    set_mac(csismp->smac, source_addr);
-    set_mac(csismp->dmac, dest_addr);
+    //set_mac(csismp->smac, source_addr);
+    //set_mac(csismp->dmac, dest_addr);
 
     csismp->pro_type = htons(0x1122);
     csismp->c_type = c_type;
@@ -287,10 +275,8 @@ int _csismp_send(int send_socket, const char *buffer, int len){
 
     struct sockaddr_ll sll;
     memset(&sll, 0, sizeof(struct sockaddr_ll));
-    //sll.sll_family = AF_PACKET;
-    //sll.sll_protocol = htons(ETH_P_ALL);
     sll.sll_ifindex = ifr.ifr_ifindex;
-//
+/*
     fprintf(stdout, "sned lens:%d\n", len);
     int i;
     for ( i=0 ; i<len ; i++){
@@ -298,7 +284,7 @@ int _csismp_send(int send_socket, const char *buffer, int len){
         if(((i+1)%16)==0) printf("\n");
     }
     fprintf(stdout,"print end\n");
-//
+*/
     if (raw_send = sendto(send_socket, buffer, len, 0,
                     (struct sockaddr *) &sll ,sizeof(struct sockaddr_ll)) ==-1)
     {
@@ -320,8 +306,8 @@ int csismp_send(int send_socket, char dest_addr[6], int type, char* tlvs, int s_
     if (type == 3 || type == 4)
     {
         //rand int <1000 return randint1000
-        buffer = csismp_construct(rsync_info.local_mac, dest_addr,
-                            type, 1, 1, 1, session, "\0",1);
+        buffer = csismp_construct(config_mac.mac_address, dest_addr,
+                            type, 1, 1, 1, session, "\0",1); //!
         _csismp_send(send_socket, buffer, 23);
     }
     else if (type == 5)
@@ -332,14 +318,13 @@ int csismp_send(int send_socket, char dest_addr[6], int type, char* tlvs, int s_
 
             srand((unsigned)time(NULL));
             //rand int > 1000 return randint
-            buffer = csismp_construct(rsync_info.local_mac, dest_addr,
-                            type, slice? 0:1, (s_len < 1024)? 1:0, slice, session + 1000, s_tlvs, s_len % 1024);
+            buffer = csismp_construct(config_mac.mac_address, dest_addr,
+                            type, slice? 0:1, (s_len < 1024)? 1:0, slice, session + 1000, s_tlvs, s_len % 1024); //!
             _csismp_send(send_socket, buffer, 22 + s_len % 1024);
             s_tlvs -= 1024;
         }
     }
 }
-
 
 char *get_interface_name(){
     struct ifaddrs *ifa = NULL, *ifList;
@@ -350,7 +335,6 @@ char *get_interface_name(){
     {
         return NULL;
     }
-
 
     for (ifa = ifList; ifa != NULL; ifa = ifa->ifa_next)
     {
@@ -367,5 +351,3 @@ char *get_interface_name(){
     freeifaddrs(ifList);
     return interface_name;
 }
-
-

@@ -65,6 +65,8 @@ void p_reply(char dest_addr[6], int type);
 void *sync_thread(void *arg);
 int csismp_send(int send_socket, char dest_addr[6], int type, char* tlvs, int s_len);
 char *get_interface_name();
+char *format_mac(char *mac);
+uint64_t transform_mac_to_int64(char *mac);
 
 
 #endif
