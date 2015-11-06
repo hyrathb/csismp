@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #define CONFIG_FILE "Config.txt"
 #define DATA_FILE "StuInfo.txt"
@@ -86,6 +87,7 @@ typedef struct session
 {
     int id;
     time_t first_time;
+    char mac_address[6];
     struct session* next;
     struct slice* info;
 }SESSION;
@@ -99,4 +101,6 @@ char* join(char* string1,char* string2);
 int store_student_info(char* faculty, char* student_id, char* student_name,STUDENT_INFO** link_student_info);
 SESSION* which_session_to_go(SLICE* package,SESSION* session_func_head);
 char* mac_address_format_convert(char* config_format);
+int append_slice_to_session(SESSION** current_node,SLICE package);
+int append_slice_to_session(SESSION** current_node,SLICE package);
 #endif
