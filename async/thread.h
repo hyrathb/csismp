@@ -24,29 +24,17 @@
 
 #define BUFFER_MAX 1049
 
-struct rsync_info{
-    char *conifg_mac;
-    char *local_mac;
-    int mac_num;
-    char *listen_mac;
-    char tlvs;
-    int len;
-}rsync_info;
 
+int main_thread();
 
 struct read_callback_buffer{
     char buffer[BUFFER_MAX];
     int len;
 };
 
-int generate_tlvs(char *buffer );
-//!
-void print_time();
-
 void p_read_callback(int sock, short event, void *arg);
 void p_sync_callback(int send_socket, short event, void *arg);
 void p_reply(unsigned char dest_addr[6], int type);
 void *sync_thread(void *arg);
-int csismp_send(int send_socket, unsigned char dest_addr[6], int type, char* tlvs, int s_len);
 
 #endif

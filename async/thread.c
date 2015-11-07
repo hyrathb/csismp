@@ -12,15 +12,11 @@ pthread_rwlock_t rwlock; // Init Posix Read-write lock
 
 // wait for zjd
 
-
-
 /*
-
 typedef struct mac{
     char* mac_address;
     struct mac* next;
 }MAC;
-
 */
 MAC listen_mac = { "\xff\xff\xff\xff\xff\xff", NULL };
 MAC config_mac = { "\xff\xff\xff\xff\xff\xff", &listen_mac };
@@ -29,8 +25,12 @@ MAC config_mac = { "\xff\xff\xff\xff\xff\xff", &listen_mac };
 
 int _csismp_send(int send_socket, const char *buffer, int len);
 
-int main(int argc, char **argv[])
+
+
+int main_thread()
 {
+    //init
+
     int listen_socket;
     listen_socket = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if ( listen_socket < 0 )
@@ -75,9 +75,9 @@ int main(int argc, char **argv[])
     listen_event = event_new(base, listen_socket, EV_READ|EV_PERSIST, p_read_callback, NULL);
 
     event_add(listen_event, NULL);
-
-    pthread_t sync_tid;
+    pthread_t sync_tid, delay_tid;
     pthread_create(&sync_tid, NULL, sync_thread, NULL);
+    pthread_create(&delay_tid, NULL, delay_thread, arg);
 
     fprintf(stdout, "- START LISTENING -\n");
     event_base_dispatch(base);
@@ -102,13 +102,23 @@ void *sync_thread(void *arg){
         exit(-1);
     }
 
-
     event_set(&sync_ev, send_socket, EV_PERSIST, p_sync_callback, NULL);
     event_base_set(base, &sync_ev);
     event_add(&sync_ev, &timer);
 
     event_base_loop(base, 0);
     return 0;
+}
+
+void *delay_thread(void *arg){
+    struct event_base *base = event_base_new();
+    event_add(listen_event, &delay_timer);
+    struct timeval delay_timer={.tv_sec = 5, .tv_usec = 0};
+    struct event delay_ev;
+
+    event_set(&delay_ev, 0, EV_PERSIST, somefunc, arg);
+    event_base_set(base, &delay_ev);
+    event_add(&delay_ev, &delay_timer);
 }
 
 /*
@@ -132,7 +142,6 @@ void read_thread(void *arg){
 <<<<<<< HEAD
     fprintf(stdout, "\n");
 */
-
     if (eth_type == 0x1122 && dmac == transform_mac_to_int64(config_mac.mac_address)){
 
     fprintf(stdout, "gegegegegegegege a packet 0x1122\n");
@@ -222,11 +231,4 @@ void print_time(){
     time(&timep);
     fprintf(stdout, "%s", ctime(&timep));
 }
-
-
-
-
-
-
-
 

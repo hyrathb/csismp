@@ -5,8 +5,6 @@
 
 extern MAC config_mac;
 
-
-
 void csismp_construct(
         unsigned char *buffer,
         unsigned char source_addr[6],
@@ -121,7 +119,7 @@ int generate_tlvs(char **s_buffer){
 
         type = 0;       buffer[i] = type;   i += 1;
         len = 0;        buffer[i] =slen;    i += 1;
-    
+
     *s_buffer = buffer;
     return i;
 }
