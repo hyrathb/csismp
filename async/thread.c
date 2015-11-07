@@ -140,12 +140,8 @@ void read_thread(void *arg){
 
 
         //TO HYR
-<<<<<<< HEAD
-        printf("- REALLY TO HYR TO HYR!-\n");
-=======
         printf("- REALLY TO HYR TO HYR!-");
         parser(buffer_arg->buffer, buffer_arg->len);
->>>>>>> 1ea5ee832757d54af37acce7bd421c8653cb160a
     }
 }
 
@@ -167,13 +163,9 @@ void p_read_callback(int sock, short event, void *arg){
     if(len < 23)
         return;
 
-<<<<<<< HEAD
+
     struct read_callback_buffer *buffer_arg = malloc( sizeof (struct read_callback_buffer) );
     memcpy(buffer_arg->buffer, buffer, len);
-=======
-    struct read_callback_buffer *buffer_arg = malloc(len);
-    strncpy(buffer_arg->buffer, buffer, len);
->>>>>>> 1ea5ee832757d54af37acce7bd421c8653cb160a
     buffer_arg->len = len;
 
     pthread_t sync_tid;
