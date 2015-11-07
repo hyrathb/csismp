@@ -6,11 +6,9 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include "../parser/parser.h"
-
-#define CONFIG_FILE "Config.txt"
-#define WRITE_CONFIG_FILE "CfgInfo.txt"
-#define DATA_FILE "StuInfo.txt"
+#include "parser.h"
+#include "utils.c"
+#include "thread.h"
 
 typedef struct mac{
     char* mac_address;
