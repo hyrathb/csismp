@@ -54,6 +54,8 @@ typedef struct session
     struct member* member;
 }SESSION;
 
+STUDENT_INFO* info_p,*info_head;
+
 int read_config(FILE *config, MAC** link_mac_address);
 int store_mac_address(char* mac_address, MAC** link_mac_address);
 int if_dst_mac_address(char* compare_list, MAC* mac_head);
