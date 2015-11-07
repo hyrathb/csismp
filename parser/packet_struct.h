@@ -36,12 +36,9 @@ typedef struct slice{
 
     unsigned char smac[6];
 
-    struct
-    {
-        int start:1;
-        int end:1;
-        int sli_num:22;
-    };
+    int start;
+    int end;
+    int sli_num;
     int session;
     union
     {

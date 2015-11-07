@@ -123,11 +123,12 @@ void read_thread(void *arg){
     uint16_t eth_type = ((uint16_t)buffer_arg->buffer[12]) << 8 | (uint16_t)buffer_arg->buffer[13];
 
     int i;
+    /*
     for ( i=0 ; i<buffer_arg->len ; i++){
         printf("%.2X ",(unsigned char)buffer_arg->buffer[i]);
         if(((i+1)%16)==0) printf("\n");
     }
-
+*/
     if (eth_type == 0x1122 /*&& smac == transform_mac_to_int64(config_mac.mac_address)*/ ){
 
 
@@ -182,7 +183,7 @@ void p_sync_callback(int send_socket, short event, void *arg){
 
     //MAC *mac = &;
     char *buffer;
-    int len = generate_tlvs(buffer);
+    int len = generate_tlvs(&buffer);
 
     MAC *dmac = config_mac.next;
 

@@ -5,33 +5,65 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdio.h>
 
 static const char max_len[4] = {0, 12, 16, 64};
 
 void fill_slice_common(struct slice *s, const struct packet *p)
 {
     s->timestamp = time(NULL);
-    memcpy(s->smac, p->smac, 6);
-    s->start = p->start;
-    s->end = p->end;
-    s->sli_num = p->slice;
+    s->smac[0] = p->smac[0];
+    s->smac[1] = p->smac[1];
+    s->smac[2] = p->smac[2];
+    s->smac[3] = p->smac[3];
+    s->smac[4] = p->smac[4];
+    s->smac[5] = p->smac[5];
+    s->start = (int)p->start;
+    s->end = (int)p->end;
+    s->sli_num = (int)p->slice;
     s->session = p->session;
+}
+
+static int count (const unsigned char *s, int elen)
+{
+    int len = 0;
+    while ((*s) && (len < elen))
+    {
+        ++s;
+        ++len;
+    }
+    if (!*s)
+        ++len;
+    else
+        return -1;
+    if (len == elen)
+        return 0;
+    else
+        return -1;
 }
 
 int check_tlv(const struct tlv *t, size_t left_len, char type_limit)
 {
     if ((t->type < 0) || (t->type > 3))
+    {
+        printf("What TYPE@!!!!\n");
         return -1;
-    
+    }
     if ((type_limit != -1) && t->type && (t->type != type_limit))
+    {
+        printf("TYPE ERROR\n");
         return -1;
-    
-    if ((t->len > left_len) || (t->len > max_len[t->type]))
+    }
+    if ((t->len > left_len) || (t->len > max_len[(int)t->type]))
+    {
+        printf("You words are too long\n");
         return -1;
-    
-    if ((strlen(t->val)+1) != t->len)
+    }
+    if ((t->type) && count(t->val, t->len))
+    {
+        printf("HEHE\n");
         return -1;
-    
+    }
    return 0; 
 }
 
@@ -65,6 +97,7 @@ int fill_slice_stu_full(struct slice *s, const char *stu, size_t max_len)
             next_type = 1;
         else
             ++next_type;
+        
         
         if (check_tlv(tlvs, max_len, next_type))
         {
@@ -179,7 +212,10 @@ struct slice * parser(unsigned char *buf, size_t len)
     new_slice->content = NULL;
     
     if (len <= 22 || len >1046)
+    {
+        printf("Length not suitable\n");
         return new_slice;
+    }
     
     unsigned char *new_buf = malloc(len);
     memcpy(new_buf, buf, len);
@@ -192,6 +228,9 @@ struct slice * parser(unsigned char *buf, size_t len)
         return new_slice;
     }
     
+    printf("get a packet\n");
+    
+    //put_byte(((unsigned char *)&(p->pro_type)) + 2, 1);
     switch(p->c_type)
     {
         case 1:
@@ -199,7 +238,6 @@ struct slice * parser(unsigned char *buf, size_t len)
             fill_slice_common(new_slice, p);
             if (fill_slice_stu_full(new_slice, p->tlvs, len-22))
             {
-                free(new_slice->smac);
                 new_slice->smac[0] = 0;
                 new_slice->type = ERROR;
             }
@@ -212,7 +250,6 @@ struct slice * parser(unsigned char *buf, size_t len)
             fill_slice_common(new_slice, p);
             if (fill_slice_stu_id(new_slice, p->tlvs, len-22))
             {
-                free(new_slice->smac);
                 new_slice->smac[0] = 0;
                 new_slice->type = ERROR;
             }
@@ -230,7 +267,6 @@ struct slice * parser(unsigned char *buf, size_t len)
             fill_slice_common(new_slice, p);
             if (fill_slice_stu_full(new_slice, p->tlvs, len-22))
             {
-                free(new_slice->smac);
                 new_slice->smac[0] = 0;
                 new_slice->type = ERROR;
             }
@@ -242,5 +278,6 @@ struct slice * parser(unsigned char *buf, size_t len)
             break;
     }
     free(new_buf);
+    printf("type %d\n", new_slice->type);
     return new_slice;
 }
