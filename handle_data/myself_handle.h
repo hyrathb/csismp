@@ -10,7 +10,7 @@
 
 #define CONFIG_FILE "Config.txt"
 #define WRITE_CONFIG_FILE "CfgInfo.txt"
-#define DATA_FILE "StuInfo.txt"
+#define DATA_FILE "StuInfo.test"
 #define DATA_TEST_FILE "StuInfo.txt"
 
 typedef struct mac{

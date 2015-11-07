@@ -170,7 +170,7 @@ int read_data_file(FILE* data_file,STUDENT_INFO** link_student_info)
     while(!feof(data_file))
     {
         fgets(a_line,81,data_file);
-        if (a_line[34]=='\n')                    //a_line[33]='\r',a_line[34]='\n'
+        if (a_line[34]=='\n'||a_line[33]=='\n'||a_line[33]=='\r')                    //a_line[33]='\r',a_line[34]='\n'
         {
             is_newline = 'y';
             a_line[33] = '\0';
@@ -187,13 +187,17 @@ int read_data_file(FILE* data_file,STUDENT_INFO** link_student_info)
                 store_student_info(join(apart1,apart2),student_id,name,link_student_info);
                 is_newline = 'n';
             }
-            /*else if (a_line[0]!='-'&&is_newline=='n'&&(!strstr(a_line,"Faculty")))
+            else if (a_line[0]!='-'&&is_newline=='n'&&!strstr(a_line,"Faculty")&&!strstr(a_line,"Time"))
                 {
-                    char apart2[33],student_id[11],name[20];
-                    sscanf(a_line,"%s %s %[a-zA-Z ]",apart2,student_id,name);
+                    char apart2[34],student_id[11],name[20];
+                    sscanf(a_line,"%33c %[a-zA-Z0-9] %[a-zA-Z ]",apart2,student_id,name);
+                    apart2[33] = '\0';
                     store_student_info(apart2,student_id,name,link_student_info);
-                    printf("%s %s %s\n",apart2,student_id,name );
-                }*/
+                    printf("handle once\n");
+                    printf("%s\n",apart2 );
+                    printf("%s\n",student_id );
+                    printf("%s\n",name );
+                }
 
 
         //printf("%s\n",a_line );
