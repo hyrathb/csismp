@@ -5,6 +5,8 @@
 
 extern MAC config_mac;
 
+
+
 void csismp_construct(
         unsigned char *buffer,
         unsigned char source_addr[6],

@@ -10,14 +10,19 @@ pthread_rwlock_t rwlock; // Init Posix Read-write lock
 */
 
 // wait for zjd
-    /*
+
+
+
+/*
+
 typedef struct mac{
     char* mac_address;
     struct mac* next;
-}MAC;*/
+}MAC;
 
-
-MAC config_mac;
+*/
+MAC listen_mac = { "\0xaa\0xbb\0xcc\0xdd\0xdd\0xdd", NULL };
+MAC config_mac = { "\0xaa\0xbb\0xcc\0xdd\0xdd\0xde", &listen_mac };
 
 #define INTERFACE_NAME "enp4s0f1"
 
@@ -84,6 +89,7 @@ int main(int argc, char **argv[])
     call p_sync_callback()
  */
 void *sync_thread(void *arg){
+    fprintf(stdout, "- sync_thread -\n");
     struct event_base *base = event_base_new();
     struct timeval timer={.tv_sec = 30, .tv_usec = 0};
     struct event sync_ev;
@@ -113,22 +119,26 @@ void read_thread(void *arg){
     uint64_t smac = transform_mac_to_int64((char *) (buffer_arg->buffer + 6) );
     uint16_t eth_type = ((uint16_t)buffer_arg->buffer[12]) << 8 | (uint16_t)buffer_arg->buffer[13];
 
-    if (eth_type == 0x1122 && smac == transform_mac_to_int64(config_mac.mac_address) ){
+    int i;
+    for ( i=0 ; i<buffer_arg->len ; i++){
+        printf("%.2X ",(unsigned char)buffer_arg->buffer[i]);
+        if(((i+1)%16)==0) printf("\n");
+    }
 
+    if (eth_type == 0x1122 /*&& smac == transform_mac_to_int64(config_mac.mac_address)*/ ){
+
+
+
+    printf("gegegegegegegege a packet 0x1122");
 /*
     pthread_rwlock_rdlock(&rwlock);    // Lock
     pthread_rwlock_unlock(&rwlock);    // Release Lock
 */
 
-/*      int i;
-        for ( i=0 ; i<len ; i++){
-            printf("%.2X ",(unsigned char)buffer[i]);
-            if(((i+1)%16)==0) printf("\n");
-*/
+
         //TO HYR
         printf("- REALLY TO HYR TO HYR!-");
     }
-    printf("-TO HYR TO HYR!-");
 }
 
 /***Registering Callbacks Funcs******************************************/
