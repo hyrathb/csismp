@@ -9,6 +9,7 @@
 #include "../parser/parser.h"
 
 #define CONFIG_FILE "Config.txt"
+#define WRITE_CONFIG_FILE "CfgInfo.txt"
 #define DATA_FILE "StuInfo.txt"
 
 typedef struct mac{
@@ -54,11 +55,13 @@ int read_data_file(FILE* data_file,STUDENT_INFO** link_mac_address);
 char* join(char* string1,char* string2);
 int store_student_info(char* faculty, char* student_id, char* student_name,STUDENT_INFO** link_student_info);
 SESSION* which_session_to_go(SLICE* package,SESSION* session_func_head);
-char* mac_address_format_convert(char* config_format);
+//char* mac_address_format_convert(char* config_format);
 int append_slice_to_session(SESSION** current_node,SLICE package,enum  P_TYPE type);
 int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info);
 int free_session(SESSION**current_node);
 int deal_session_in_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,enum P_TYPE type);
 int slice_handle(SLICE package,SESSION** data_session,STUDENT_INFO** link_student_info);
 int create_session_and_add_slice(SESSION** current_node,SLICE package,enum  P_TYPE type);
+int print_config_to_file(MAC* mac_head);
+int sort_mac_address(MAC** link_mac_address);
 #endif
