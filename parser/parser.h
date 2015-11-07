@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "packet_struct.h"
 
+#pragma pack(2)
 struct tlv
 {
     char type;
@@ -11,6 +12,7 @@ struct tlv
     char val[0];
 };
 
+#pragma pack(2)
 struct packet
 {
     unsigned char smac[6];
@@ -18,12 +20,12 @@ struct packet
     short pro_type;
     struct
     {
-        char c_type;
+        int c_type:8;
         int start:1;
         int end:1;
         int slice:22;
-        int session;
     };
+    int session;
     char tlvs[];
 };
 

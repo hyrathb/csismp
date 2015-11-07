@@ -92,7 +92,7 @@ typedef struct student_info{
 }STUDENT_INFO;*/
 STUDENT_INFO student_info;
 
-int generate_tlvs(char *buffer){
+int generate_tlvs(char **s_buffer){
     int len;
     STUDENT_INFO *tmp;
     for ( len = 0, tmp = &student_info ; tmp != NULL ; tmp = tmp->next ){
@@ -103,7 +103,7 @@ int generate_tlvs(char *buffer){
     char type;
     char slen;
     int i;
-    buffer = malloc(sizeof(char) * len);
+    char * buffer = malloc(sizeof(char) * len);
     for ( i = 0, tmp = &student_info ; tmp != NULL ; tmp = tmp->next ){
 
         type = 1;                 buffer[i] = type;   i += 1;
@@ -121,7 +121,8 @@ int generate_tlvs(char *buffer){
 
         type = 0;       buffer[i] = type;   i += 1;
         len = 0;        buffer[i] =slen;    i += 1;
-
+    
+    *s_buffer = buffer;
     return i;
 }
 
@@ -164,4 +165,5 @@ int csismp_send(int send_socket, unsigned char dest_addr[6], int type, char* tlv
             ++s_num;
         }
     }
+    return 0;
 }

@@ -21,6 +21,8 @@
 
 #define hton(dbuf, len) ntoh(dbuf, len)
 
+void put_byte(unsigned char *x, int n);
+
 void swap_byte(unsigned char *b1, unsigned char *b2);
 
 void ntoh_nbytes(unsigned char *buf, size_t len, size_t silly_bits);

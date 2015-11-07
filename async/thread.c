@@ -124,15 +124,16 @@ void read_thread(void *arg){
 
 /*
     int i;
+    /*
     for ( i=0 ; i<buffer_arg->len ; i++){
         fprintf(stdout, "%.2X ",(unsigned char)buffer_arg->buffer[i]);
         if(((i+1)%16)==0) fprintf(stdout, "\n");
     }
+<<<<<<< HEAD
     fprintf(stdout, "\n");
 */
 
     if (eth_type == 0x1122 && dmac == transform_mac_to_int64(config_mac.mac_address)){
-
 
     fprintf(stdout, "gegegegegegegege a packet 0x1122\n");
 /*
@@ -184,7 +185,7 @@ void p_sync_callback(int send_socket, short event, void *arg){
 
     //MAC *mac = &;
     char *buffer;
-    int len = generate_tlvs(buffer);
+    int len = generate_tlvs(&buffer);
 
     MAC *dmac = config_mac.next;
     for ( ; dmac != NULL ; dmac = dmac->next)

@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 static const unsigned char rbits[8] = {0x0, 0x1, 0x3, 0x7, 0xf, 0x1f, 0x3f, 0x7f};
 static const unsigned char lbits[8] = {0x0, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe};
@@ -15,10 +16,8 @@ void swap_byte(unsigned char *b1, unsigned char *b2)
 
 void ntoh_nbytes(unsigned char *dst, size_t n, size_t silly_bits)
 {
-    if (n <= 8)
-        return;
     unsigned char *h=dst, *t=dst+n-1;
-    unsigned char silly=*h & lbits[silly];
+    unsigned char silly=*h & lbits[silly_bits];
     while (h<t)
     {
         swap_byte(h, t);
@@ -27,7 +26,7 @@ void ntoh_nbytes(unsigned char *dst, size_t n, size_t silly_bits)
     }
     if (silly_bits)
     {
-        char *h=dst, *t=dst+n-1;
+        unsigned char *h=dst, *t=dst+n-1;
         *t <<= silly_bits;
         unsigned char left = silly;
         while (h <= t)
@@ -43,7 +42,7 @@ void ntoh_nbytes(unsigned char *dst, size_t n, size_t silly_bits)
 
 void ntoh(unsigned char *dbuf, size_t len)
 {
-   ntoh_6bytes(dbuf);
+    ntoh_6bytes(dbuf);
    dbuf += 6;
 
    ntoh_6bytes(dbuf);
@@ -129,3 +128,14 @@ char* mac_upper(const char *str){
     return buffer;
 }
 
+
+void put_byte(unsigned char *x, int n)
+{
+    int i;
+    for (i=0; i<n; ++i)
+    {
+        int haha = *x;
+        printf("%02x ", haha);
+        ++x;
+    }
+}
