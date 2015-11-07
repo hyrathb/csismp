@@ -1,6 +1,6 @@
 #include "thread.h"
-#include "utils.h"
-#include "handle_data.h"
+#include "../utils.h"
+#include "../handle_data/handle_data.h"
 
 
 pthread_rwlock_t rwlock; // Init Posix Read-write lock
@@ -9,14 +9,12 @@ pthread_rwlock_t rwlock; // Init Posix Read-write lock
     pthread_rwlock_unlock(&rwlock);    // Release Lock
 */
 
+// wait for zjd
+    /*
 typedef struct mac{
     char* mac_address;
     struct mac* next;
-}MAC;
-
-
-
-
+}MAC;*/
 
 
 MAC config_mac;
@@ -168,8 +166,8 @@ void p_sync_callback(int send_socket, short event, void *arg){
     fprintf(stdout, "- START SYNC START -\n");
 
     //MAC *mac = &;
-    char buffer[BUFFER_MAX * 8];
-    int len = generate_tlvs(&buffer);
+    char *buffer;
+    int len = generate_tlvs(buffer);
 
     MAC *dmac = config_mac.next;
 
@@ -184,7 +182,7 @@ void p_sync_callback(int send_socket, short event, void *arg){
     Public Called Func:
         send reply message
 */
-void p_reply(char dest_addr[6], int type){
+void p_reply(unsigned char dest_addr[6], int type){
     int reply_socket = socket(PF_INET, SOCK_RAW, htons(ETH_P_ALL));
     if ( reply_socket < 0 )
     {

@@ -31,10 +31,10 @@ char *get_interface_name();
 
 char *format_mac(char *mac);
 
-uint64_t transform_mac_to_int64(unsigned char *mac);
+uint64_t transform_mac_to_int64(unsigned char *mac);//char[6] to 0xFFFFFFFFFFFF
 
 char* mac_upper(const char *str);
 
-char *format(char *mac);
+unsigned char *format(char *mac);// "FF-FF-FF-FF-FF-FF" or "FFFFFFFFFFFF" to unsigned char[6]
 
 #endif

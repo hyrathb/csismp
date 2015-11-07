@@ -88,7 +88,7 @@ char *get_interface_name(){
     return interface_name;
 }
 
-char *format(char *mac){  // "FF-FF-FF-FF-FF-FF" or "FFFFFFFFFFFF" to unsigned char[6]
+unsigned char *format(char *mac){  // "FF-FF-FF-FF-FF-FF" or "FFFFFFFFFFFF" to unsigned char[6]
     int j, k;
     unsigned char *format_mac = malloc(sizeof(char) * 7);
     memset (format_mac, 0, sizeof(char) * 7);

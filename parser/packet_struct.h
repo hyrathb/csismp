@@ -23,7 +23,7 @@ struct stu_id
     struct stu_id *next;
 };
 
-struct slice{
+typedef struct slice{
     enum P_TYPE
     {
         ADD,
@@ -31,11 +31,11 @@ struct slice{
         SYN,
         ERROR
     } type;
-    
+
     time_t timestamp;
-    
+
     unsigned char smac[6];
-    
+
     struct
     {
         int start:1;
@@ -48,5 +48,5 @@ struct slice{
         struct stu_full* content;
         struct stu_id *id_content;
     };
-};
+} SLICE;
 #endif
