@@ -3,7 +3,7 @@
 #include "handle_data.h"
 #include "parser.h"
 
-extern MAC config_mac;
+extern MAC* mac_head;
 
 void csismp_construct(
         unsigned char *buffer,
@@ -86,12 +86,12 @@ typedef struct student_info{
     char* name;
     struct student_info* next;
 }STUDENT_INFO;*/
-STUDENT_INFO student_info;
+//info_head;
 
 int generate_tlvs(char **s_buffer){
     int len;
     STUDENT_INFO *tmp;
-    for ( len = 0, tmp = &student_info ; tmp != NULL ; tmp = tmp->next ){
+    for ( len = 0, tmp = info_head ; tmp != NULL ; tmp = tmp->next ){
         len += strlen(tmp->faculty)  + strlen(tmp->id) + strlen(tmp->name) + 9;
     }
     len += 3;
@@ -100,7 +100,7 @@ int generate_tlvs(char **s_buffer){
     char slen;
     int i;
     char * buffer = malloc(sizeof(char) * len);
-    for ( i = 0, tmp = &student_info ; tmp != NULL ; tmp = tmp->next ){
+    for ( i = 0, tmp = info_head ; tmp != NULL ; tmp = tmp->next ){
 
         type = 1;                 buffer[i] = type;   i += 1;
         slen = strlen(tmp->id) + 1;buffer[i] = slen;    i += 1;
@@ -132,7 +132,7 @@ int csismp_send(int send_socket, unsigned char dest_addr[6], int type, char* tlv
     if (type == 3 || type == 4)
     {
         //rand int <1000 return randint1000
-        csismp_construct(buffer, (unsigned char *)config_mac.mac_address, dest_addr,
+        csismp_construct(buffer, (unsigned char *)mac_head->mac_address, dest_addr,
                             type, 1, 1, 0, session, "\0\0",2); //!
         _csismp_send(send_socket, buffer, 24);
     }
@@ -156,7 +156,7 @@ int csismp_send(int send_socket, unsigned char dest_addr[6], int type, char* tlv
                 t = (void *)now_tlv;
                 size += t->len;
             }
-            csismp_construct(buffer, (unsigned char *)config_mac.mac_address, dest_addr, type, (s_num == 0), (left_length <= 0), s_num, session, "", 0);
+            csismp_construct(buffer, (unsigned char *)mac_head->mac_address, dest_addr, type, (s_num == 0), (left_length <= 0), s_num, session, "", 0);
             _csismp_send(send_socket, buffer, size+22);
             ++s_num;
         }

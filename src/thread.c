@@ -4,6 +4,8 @@
 #include "parser.h"
 #include "cssismp_send.h"
 
+extern MAC *mac_head;
+
 pthread_rwlock_t rwlock; // Init Posix Read-write lock
 /*
     pthread_rwlock_rdlock(&rwlock);    // Lock
@@ -18,10 +20,6 @@ typedef struct mac{
     struct mac* next;
 }MAC;
 */
-MAC listen_mac = { "\xff\xff\xff\xff\xff\xff", NULL };
-MAC config_mac = { "\xff\xff\xff\xff\xff\xff", &listen_mac };
-
-#define INTERFACE_NAME "enp4s0f1"
 
 int _csismp_send(int send_socket, const char *buffer, int len);
 
@@ -91,7 +89,7 @@ int main_thread()
 void *sync_thread(void *arg){
     fprintf(stdout, "- sync_thread -\n");
     struct event_base *base = event_base_new();
-    struct timeval timer={.tv_sec = 30, .tv_usec = 0};
+    struct timeval timer={.tv_sec = 30, .tv_usec = 0};                  
     struct event sync_ev;
 
     int send_socket = socket(PF_INET, SOCK_RAW, htons(ETH_P_ALL));
@@ -113,8 +111,10 @@ void *delay_thread(void *arg){
     struct event_base *base = event_base_new();
     struct timeval delay_timer={.tv_sec = 5, .tv_usec = 0};
     struct event delay_ev;
-
-    event_set(&delay_ev, 0, EV_PERSIST, NULL, NULL);
+    session_p = session_head;
+    info_p = info_head;
+    academy_p = academy_head;
+    event_set(&delay_ev, 0, EV_PERSIST, deal_session_in_student_info(&session_p,info_p,ADD,academy_p), NULL); //TODO
     event_base_set(base, &delay_ev);
     event_add(&delay_ev, &delay_timer);
 
@@ -140,16 +140,19 @@ void read_thread(void *arg){
     }
 
 */
-    if (eth_type == 0x1122 && dmac == transform_mac_to_int64(config_mac.mac_address)){
+    if (eth_type == 0x1122 && dmac == transform_mac_to_int64(mac_head->mac_address)){
 
-    fprintf(stdout, "gegegegegegegege a packet 0x1122\n");
 /*
     pthread_rwlock_rdlock(&rwlock);    // Lock
     pthread_rwlock_unlock(&rwlock);    // Release Lock
 */
         //TO HYR
         fprintf(stdout, "- REALLY TO HYR TO HYR!-\n");
-        parser(buffer_arg->buffer, buffer_arg->len);
+        session_p = session_head;
+        info_p = info_head;
+        struct slice* slice_tmp = parser(buffer_arg->buffer, buffer_arg->len);
+        slice_handle(slice_tmp,&session_p,&info_p);   //TODO return slice
+        free(slice_tmp);
 
         pthread_rwlock_unlock(&rwlock);    // Release Lock
     }
@@ -195,7 +198,7 @@ void p_sync_callback(int send_socket, short event, void *arg){
     char *buffer;
     int len = generate_tlvs(&buffer);
 
-    MAC *dmac = config_mac.next;
+    MAC *dmac = mac_head->next;
     for ( ; dmac != NULL ; dmac = dmac->next)
     {
         csismp_send(send_socket, dmac->mac_address, 5, buffer, len);//!

@@ -272,30 +272,30 @@ char* join(char* string1,char* string2)
  *sync
  */
 
-int slice_handle(SLICE package,SESSION** data_session,STUDENT_INFO** link_student_info)
+int slice_handle(SLICE *package,SESSION** data_session,STUDENT_INFO** link_student_info)
 {
     SESSION *p_session = *data_session;
     int judge_return = 0;
     while(p_session!=NULL)
     {
-        if (is_time_expire(p_session->first_time,package.timestamp))
+        if (is_time_expire(p_session->first_time,package->timestamp))
         {
             handle_session(&p_session,link_student_info,0);
         }
-        else if (p_session->id == package.session&&p_session->type == package.type&&!strcmp(p_session->mac_address,package.smac))
+        else if (p_session->id == package->session&&p_session->type == package->type&&!strcmp(p_session->mac_address,package->smac))
         {
-            append_slice_to_session(&p_session,package,package.type);
+            append_slice_to_session(&p_session,*package,package->type);
             judge_return = 1;
         }
-        else if (p_session->id == package.session&&p_session->type == ERROR)
+        else if (p_session->id == package->session&&p_session->type == ERROR)
         {
             free_session(&p_session);
         }
         p_session = p_session->next;
     }
-    if (judge_return == 0&&package.type!=ERROR)
+    if (judge_return == 0&&package->type!=ERROR)
     {
-        create_session_and_add_slice(data_session,package,package.type);
+        create_session_and_add_slice(data_session,*package,package->type);
     }
     return 0;
 }

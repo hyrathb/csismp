@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "parser.h"
 
-#include "utils.c"
+#include "utils.h"
 #include "thread.h"
 
 #define CONFIG_FILE "Config.txt"
@@ -58,6 +58,9 @@ typedef struct session
 }SESSION;
 
 STUDENT_INFO* info_p,*info_head;
+SESSION* session_head,*session_p;
+OTHER_ACADEMY *academy_head,*academy_p;
+MAC *mac_head;
 
 int read_config(FILE *config, MAC** link_mac_address);
 int store_mac_address(char* mac_address, MAC** link_mac_address);
@@ -73,7 +76,7 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info,OTHER
 int free_session(SESSION**current_node);
 int deal_session_in_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,\
     enum P_TYPE type,OTHER_ACADEMY** other_stu_info);
-int slice_handle(SLICE package,SESSION** data_session,STUDENT_INFO** link_student_info);
+int slice_handle(SLICE *package,SESSION** data_session,STUDENT_INFO** link_student_info);
 int create_session_and_add_slice(SESSION** current_node,SLICE package,enum  P_TYPE type);
 int print_config_to_file(MAC* mac_head);
 int sort_mac_address(MAC** link_mac_address);
