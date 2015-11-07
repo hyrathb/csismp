@@ -1,6 +1,7 @@
 #include "thread.h"
 #include "../utils.h"
 #include "../handle_data/handle_data.h"
+#include "../parser/parser.h"
 
 
 pthread_rwlock_t rwlock; // Init Posix Read-write lock
@@ -21,10 +22,10 @@ typedef struct mac{
 }MAC;
 
 */
-MAC listen_mac = { "\0xaa\0xbb\0xcc\0xdd\0xdd\0xdd", NULL };
-MAC config_mac = { "\0xaa\0xbb\0xcc\0xdd\0xdd\0xde", &listen_mac };
+MAC listen_mac = { "\xcc\xcc\xcc\xcc\xcc\xcc", NULL };
+MAC config_mac = { "\xaa\xbb\xcc\xdd\xdd\xde", &listen_mac };
 
-#define INTERFACE_NAME "enp4s0f1"
+#define INTERFACE_NAME "lo"
 
 int _csismp_send(int send_socket, const char *buffer, int len);
 
@@ -138,6 +139,7 @@ void read_thread(void *arg){
 
         //TO HYR
         printf("- REALLY TO HYR TO HYR!-");
+        parser(buffer_arg->buffer, buffer_arg->len);
     }
 }
 
@@ -159,7 +161,7 @@ void p_read_callback(int sock, short event, void *arg){
     if(len < 23)
         return;
 
-    struct read_callback_buffer *buffer_arg = malloc(sizeof(struct read_callback_buffer));
+    struct read_callback_buffer *buffer_arg = malloc(len);
     strncpy(buffer_arg->buffer, buffer, len);
     buffer_arg->len = len;
 
