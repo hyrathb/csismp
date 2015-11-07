@@ -1,20 +1,25 @@
 #include "thread.h"
 #include "utils.h"
+#include "handle_data.h"
+
+
+pthread_rwlock_t rwlock; // Init Posix Read-write lock
+/*
+    pthread_rwlock_rdlock(&rwlock);    // Lock
+    pthread_rwlock_unlock(&rwlock);    // Release Lock
+*/
 
 typedef struct mac{
     char* mac_address;
     struct mac* next;
 }MAC;
 
-typedef struct student_info{
-    char* faculty;
-    char* id;
-    char* name;
-    struct student_info* next;
-}STUDENT_INFO;
+
+
+
+
 
 MAC config_mac;
-
 
 #define INTERFACE_NAME "enp4s0f1"
 
@@ -24,19 +29,19 @@ int main(int argc, char **argv[])
 {
     int listen_socket;
     listen_socket = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-
     if ( listen_socket < 0 )
     {
         fprintf(stderr ,"Failed to create socket\n");
         exit(-1);
     }
 
+    /*bind and set listen_sock*/
     struct ifreq ifr;
 
-#ifdef INTERFACE_NAME
+#ifdef INTERFACE_NAME                                       //set interface name
     strcpy(ifr.ifr_name, INTERFACE_NAME);
 #else
-    strcpy(ifr.ifr_name, get_interface_name());
+    strcpy(ifr.ifr_name, get_interface_name());             //get the first interface name whit lexicographical order
 #endif
 
     if (ioctl(listen_socket, SIOCGIFINDEX, &ifr) == -1) {
@@ -61,6 +66,7 @@ int main(int argc, char **argv[])
         exit(-1);
     }
 
+    /*start event loop*/
     struct event_base *base = event_base_new();
     struct event *listen_event;
     listen_event = event_new(base, listen_socket, EV_READ|EV_PERSIST, p_read_callback, NULL);
@@ -74,6 +80,11 @@ int main(int argc, char **argv[])
     event_base_dispatch(base);
 }
 
+/***thread Funcs******************************************/
+/*
+    new thread to set a timer for synchronization event every 30 second.
+    call p_sync_callback()
+ */
 void *sync_thread(void *arg){
     struct event_base *base = event_base_new();
     struct timeval timer={.tv_sec = 30, .tv_usec = 0};
@@ -94,8 +105,10 @@ void *sync_thread(void *arg){
     return 0;
 }
 
-
-/*******************************/
+/*
+    recv data from p_read_callback()
+    analyze its header and send package to parser();
+ */
 void read_thread(void *arg){
     struct read_callback_buffer *buffer_arg = (struct read_callback_buffer *)arg;
 
@@ -103,6 +116,12 @@ void read_thread(void *arg){
     uint16_t eth_type = ((uint16_t)buffer_arg->buffer[12]) << 8 | (uint16_t)buffer_arg->buffer[13];
 
     if (eth_type == 0x1122 && smac == transform_mac_to_int64(config_mac.mac_address) ){
+
+/*
+    pthread_rwlock_rdlock(&rwlock);    // Lock
+    pthread_rwlock_unlock(&rwlock);    // Release Lock
+*/
+
 /*      int i;
         for ( i=0 ; i<len ; i++){
             printf("%.2X ",(unsigned char)buffer[i]);
@@ -114,8 +133,12 @@ void read_thread(void *arg){
     printf("-TO HYR TO HYR!-");
 }
 
-/******************************/
-
+/***Registering Callbacks Funcs******************************************/
+/*
+    Registering Callbacks Func:
+        recvform listen_socket and start new thread to handle data
+    recv data to read_thread();
+ */
 void p_read_callback(int sock, short event, void *arg){
     printf("-RECIVED PACKET-\n");
 
@@ -136,10 +159,10 @@ void p_read_callback(int sock, short event, void *arg){
     pthread_create(&sync_tid, NULL, (void * (*)(void *))&read_thread, buffer_arg);
 }
 
-int generate_tlvs(void *);
-//!
-
-
+/*
+    Registering Callbacks Func:
+        every 30 seconds called to send sync message
+ */
 void p_sync_callback(int send_socket, short event, void *arg){
     print_time();
     fprintf(stdout, "- START SYNC START -\n");
@@ -157,6 +180,10 @@ void p_sync_callback(int send_socket, short event, void *arg){
 //!
 }
 
+/*
+    Public Called Func:
+        send reply message
+*/
 void p_reply(char dest_addr[6], int type){
     int reply_socket = socket(PF_INET, SOCK_RAW, htons(ETH_P_ALL));
     if ( reply_socket < 0 )
@@ -169,109 +196,10 @@ void p_reply(char dest_addr[6], int type){
     close(reply_socket);
 }
 
-/******************************************/
-char* csismp_construct(
-        char source_addr[6],
-        char dest_addr[6],
-        int c_type,
-        int start,
-        int end,
-        int slice,
-        int session,
-        const char* s_tlvs,
-        int len)
-{
-    struct packet *csismp = malloc(sizeof(struct packet));
-
-    //set_mac(csismp->smac, source_addr);
-    //set_mac(csismp->dmac, dest_addr);
-
-    csismp->pro_type = htons(0x1122);
-    csismp->c_type = c_type;
-
-    csismp->start = start;
-    csismp->end = end;
-    csismp->slice = slice;
-    csismp->session = hton_4bytes(session);
-    strncpy(csismp->tlvs, s_tlvs, len);
-
-    return (char*)csismp;
-}
-
-int _csismp_send(int send_socket, const char *buffer, int len){
-    int raw_send;
-
-    struct ifreq ifr;
-    memset(&ifr, 0, sizeof(ifr));
-    strncpy (ifr.ifr_name, "enp4s0f1", sizeof(ifr.ifr_name) - 1);
-    ifr.ifr_name[sizeof(ifr.ifr_name)-1] = '\0';
-
-    if (ioctl(send_socket, SIOCGIFINDEX, &ifr) == -1) {
-        fprintf(stderr ,"ioctl error,no such interface\n");
-        close(send_socket);
-        exit(-1);
-    }
-
-    ioctl(send_socket, SIOCGIFFLAGS, &ifr);
-    if ( (ifr.ifr_flags & 0x1) == 0) {
-        fprintf(stderr ,"ioctl error,the interface is down\n");
-        close(send_socket);
-    }
-    ioctl(send_socket, SIOCGIFINDEX, &ifr);
-
-    struct sockaddr_ll sll;
-    memset(&sll, 0, sizeof(struct sockaddr_ll));
-    sll.sll_ifindex = ifr.ifr_ifindex;
+/***other func******************************************/
 /*
-    fprintf(stdout, "sned lens:%d\n", len);
-    int i;
-    for ( i=0 ; i<len ; i++){
-        fprintf(stdout, "%.2X ",(unsigned char)buffer[i]);
-        if(((i+1)%16)==0) printf("\n");
-    }
-    fprintf(stdout,"print end\n");
+    print current time
 */
-    if (raw_send = sendto(send_socket, buffer, len, 0,
-                    (struct sockaddr *) &sll ,sizeof(struct sockaddr_ll)) ==-1)
-    {
-        fprintf(stderr ,"_csismp_send error\n");
-        return -1;
-    }
-    return 0;
-}
-
-int csismp_send(int send_socket, char dest_addr[6], int type, char* tlvs, int s_len){
-    char *s_tlvs = tlvs;
-    char *buffer = malloc(sizeof(char) * BUFFER_MAX);
-    int end;
-    int slice; // slice
-    static int session = 0; // session id
-    session += 1;
-    if (session > 1000) session = 1;
-
-    if (type == 3 || type == 4)
-    {
-        //rand int <1000 return randint1000
-        buffer = csismp_construct(config_mac.mac_address, dest_addr,
-                            type, 1, 1, 1, session, "\0",1); //!
-        _csismp_send(send_socket, buffer, 23);
-    }
-    else if (type == 5)
-    {
-        //ranint
-        for ( slice = 0 ; s_len > 0; s_len =-1023 )
-        {
-
-            srand((unsigned)time(NULL));
-            //rand int > 1000 return randint
-            buffer = csismp_construct(config_mac.mac_address, dest_addr,
-                            type, slice? 0:1, (s_len < 1024)? 1:0, slice, session + 1000, s_tlvs, s_len % 1024); //!
-            _csismp_send(send_socket, buffer, 22 + s_len % 1024);
-            s_tlvs -= 1024;
-        }
-    }
-}
-
 void print_time(){
     time_t timep;
     time(&timep);

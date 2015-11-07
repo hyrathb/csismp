@@ -26,8 +26,6 @@
 
 #define BUFFER_MAX 1049
 
-
-
 struct rsync_info{
     char *conifg_mac;
     char *local_mac;
@@ -37,11 +35,10 @@ struct rsync_info{
     int len;
 }rsync_info;
 
-
 typedef struct packet
 {
-    char smac[6];
-    char dmac[6];
+    unsigned char smac[6];
+    unsigned char dmac[6];
     short pro_type;
     struct
     {
@@ -59,7 +56,8 @@ struct read_callback_buffer{
     int len;
 };
 
-
+int generate_tlvs(void *);
+//!
 void print_time();
 
 void p_read_callback(int sock, short event, void *arg);
