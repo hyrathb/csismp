@@ -67,11 +67,11 @@ typedef struct slice{
         SYN,
         ERROR
     } type;
-    
+
     time_t timestamp;
-    
-    char smac[6];
-    
+
+    unsigned char smac[6];
+
     struct
     {
         int start:1;
@@ -84,7 +84,7 @@ typedef struct slice{
         struct stu_full* content;
         struct stu_id *id_content;
     };
-}SLICE;
+} SLICE;
 
 typedef struct member
 {
@@ -137,4 +137,5 @@ int print_school_info(STUDENT_INFO** link_student_info);
 int sync_school_info_in_memory(SESSION** current_node,OTHER_ACADEMY** other_stu_info);
 int free_stu_node(STUDENT_INFO** all_clean);
 char* get_time(void);
+int clear_all(void);
 #endif

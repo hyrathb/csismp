@@ -10,9 +10,9 @@ int main(void)
         printf("error while reading config file\n");
         exit(-1);
     }
-    //todo:create init function
+
     MAC* mac_p = (MAC*)malloc(sizeof(*mac_p));
-    MAC* mac_head = mac_p;                              //head(the first) node does not store data
+    MAC* mac_head = mac_p;
     mac_head->next = NULL;
     mac_p = mac_head;
 
@@ -22,27 +22,11 @@ int main(void)
         exit(-1);
     }
     fclose(config);
-    //here you should sort mac address!!!
 
 
-    //this is the mac_address link test
-    //MAC* test1 = mac_head->next;
-    /*while(test1!=NULL)
-    {
-        printf("%s\n",test1->mac_address );
-        test1 = test1->next;
-    }*/
-    //mac_p = mac_head->next->next;
     MAC* test3 = mac_head->next->next;
     sort_mac_address(&test3);
-    MAC* test1 = mac_head->next;
-    while(test1!=NULL)
-    {
-        printf("%s\n",test1->mac_address );
-        test1 = test1->next;
-    }
     print_config_to_file(mac_head);
-    //test end
 
     if(!(data = fopen(DATA_FILE,"r+")))
     {
@@ -57,32 +41,19 @@ int main(void)
     fclose(data);
     print_school_info(&info_head->next);
 
-    //this is the stu_info link test
-    /*STUDENT_INFO* test2 = info_head->next;
-    printf("link test2!\n");
-    while(test2!=NULL)
-    {
-        printf("student info faculty is %s\n",test2->faculty);
-        printf("student info id is %s\n",test2->id);
-        printf("student info name is %s\n",test2->name);
-        test2 = test2->next;
-    }*/
-    //test end
-
-    //begin handle data(struct slice):
-    //todo:init func
-
     SESSION* session_head = (SESSION*)malloc(sizeof(*session_head));
     session_head->next = NULL;
     SESSION* session_p = session_head;
-     
-
-
-
-
     return 0;
 }
 
+
+int clear_all(SESSIOM** session_head)
+{
+    SESSIOM* session_p = *session_head;
+    deal_session_in_student_info()
+    return 1;
+}
 
 /*function name:read_config
  *
