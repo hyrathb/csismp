@@ -54,6 +54,8 @@ int main(void)
     info_head->next = NULL;
     info_p = info_head;
     read_data_file(data, &info_p);
+    fclose(data);
+    print_school_info(&info_head->next);
 
     //this is the stu_info link test
     /*STUDENT_INFO* test2 = info_head->next;
@@ -69,6 +71,7 @@ int main(void)
 
     //begin handle data(struct slice):
     //todo:init func
+
     SESSION* session_head = (SESSION*)malloc(sizeof(*session_head));
     session_head->next = NULL;
     SESSION* session_p = session_head;
@@ -663,7 +666,35 @@ int deal_session_in_student_info(SESSION** current_node,STUDENT_INFO** link_stud
 
 int print_school_info(STUDENT_INFO** link_student_info)
 {
-
+    FILE* data;
+    if(!(data = fopen(DATA_FILE,"w+")))
+    {
+        printf("error while reading data file\n");
+        exit(-1);
+    }
+    fprintf(data, "Time : %s\n", get_time());
+    fprintf(data, "Faculty                             Student ID       Name\n" );
+    fprintf(data, "--------------------------------------------------------------------------------\n" );
+    STUDENT_INFO* stu_print = *link_student_info;
+    while(stu_print!=NULL)
+    {
+        if (strlen(stu_print->faculty)>33)
+        {
+            fprintf(data, "%-33.33s\n",stu_print->faculty );
+            fprintf(data, "%-36.33s", stu_print->faculty+33);
+        }
+        else
+            fprintf(data, "%-36.33s", stu_print->faculty);
+        fprintf(data, "%-17.10s",stu_print->id );
+        fprintf(data, "%s\n",stu_print->name );
+        fprintf(data, "--------------------------------------------------------------------------------");
+        stu_print = stu_print->next;
+        if (stu_print!=NULL)
+        {
+            printf("hahaahah\n");
+            fprintf(data, "\n");
+        }
+    }
     return 1;
 }
 
@@ -723,8 +754,7 @@ char* get_time(void)
     sprintf(a,"%d",hour);
     sprintf(b,"%d",min);
     sprintf(c,"%d",sec);
-    return join(join(a,b),c);
-    printf("%d %d %d\n", hour, min, sec);
+    return join(join(join(join(a,":"),b),":"),c);
 }
 /*
 int add_in_file()
