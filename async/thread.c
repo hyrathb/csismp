@@ -101,6 +101,7 @@ void *sync_thread(void *arg){
         exit(-1);
     }
 
+
     event_set(&sync_ev, send_socket, EV_PERSIST, p_sync_callback, &rsync_info);//!
     event_base_set(base, &sync_ev);
     event_add(&sync_ev, &timer);
@@ -114,6 +115,7 @@ void *sync_thread(void *arg){
     analyze its header and send package to parser();
  */
 void read_thread(void *arg){
+
     struct read_callback_buffer *buffer_arg = (struct read_callback_buffer *)arg;
 
     uint64_t smac = transform_mac_to_int64((char *) (buffer_arg->buffer + 6) );
@@ -129,7 +131,7 @@ void read_thread(void *arg){
 
 
 
-    printf("gegegegegegegege a packet 0x1122");
+    printf("gegegegegegegege a packet 0x1122\n");
 /*
     pthread_rwlock_rdlock(&rwlock);    // Lock
     pthread_rwlock_unlock(&rwlock);    // Release Lock
@@ -137,7 +139,7 @@ void read_thread(void *arg){
 
 
         //TO HYR
-        printf("- REALLY TO HYR TO HYR!-");
+        printf("- REALLY TO HYR TO HYR!-\n");
     }
 }
 
@@ -159,8 +161,8 @@ void p_read_callback(int sock, short event, void *arg){
     if(len < 23)
         return;
 
-    struct read_callback_buffer *buffer_arg = malloc(sizeof(struct read_callback_buffer));
-    strncpy(buffer_arg->buffer, buffer, len);
+    struct read_callback_buffer *buffer_arg = malloc( sizeof (struct read_callback_buffer) );
+    memcpy(buffer_arg->buffer, buffer, len);
     buffer_arg->len = len;
 
     pthread_t sync_tid;
