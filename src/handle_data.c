@@ -400,9 +400,11 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info,OTHER
             {
                 if(deal_session_in_student_info(current_node,link_student_info,DEL,0))
                 {
-
+                	p_reply(session_head->mac_address,3);
                     print_school_info(link_student_info);
                 }
+                else
+                	p_reply(session_head->mac_address,4);
                 free_session(current_node);
                 return 1;
             }
@@ -426,8 +428,11 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info,OTHER
             }
             if(deal_session_in_student_info(current_node,link_student_info,DEL,0))
             {
+            	p_reply(session_head->mac_address,3);
                 print_school_info(link_student_info);
             }
+            else
+                p_reply(session_head->mac_address,4);
             free_session(current_node);
             return 1;
         }
@@ -460,8 +465,11 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info,OTHER
             }
             if(deal_session_in_student_info(current_node,link_student_info,session_head->type,other_stu_info))
             {
+            	p_reply(session_head->mac_address,3);
                 print_school_info(link_student_info);
             }
+            else
+                p_reply(session_head->mac_address,4);
             free_session(current_node);
             return 1;
         }
