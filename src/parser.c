@@ -82,7 +82,7 @@ int fill_slice_stu_full(struct slice *s, const char *stu, size_t max_len)
     tmplv->type = tlvs->type - 1;
     tmplv->len = tlvs->len-1;
     tmplv->content = malloc(tlvs->len);
-    strcpy(tmplv->content, tlvs->val);
+    strcpy(tmplv->content, (void *)tlvs->val);
     tmplv->next = NULL;
     max_len -= tlvs->len + 2;
     s->content = tmplv;
@@ -118,7 +118,7 @@ int fill_slice_stu_full(struct slice *s, const char *stu, size_t max_len)
             new_lv->type = tlvs->type-1;
             new_lv->len = tlvs->len-1;
             new_lv->content = malloc(tlvs->len);
-            strcpy(new_lv->content, tlvs->val);
+            strcpy(new_lv->content, (void *)tlvs->val);
             new_lv->next = NULL;
             max_len -= tlvs->len + 2;
             tmplv->next = new_lv;
@@ -154,7 +154,7 @@ int fill_slice_stu_id(struct slice *s, const char *id, size_t max_len)
     struct stu_id *tmpid = malloc(sizeof(struct stu_id));
     tmpid->len = tlvs->len-1;
     tmpid->id = malloc(tlvs->len);
-    strcpy(tmpid->id, tlvs->val);
+    strcpy(tmpid->id, (void *)tlvs->val);
     tmpid->next = NULL;
     max_len -= tlvs->len + 2;
     s->id_content = tmpid;
@@ -181,7 +181,7 @@ int fill_slice_stu_id(struct slice *s, const char *id, size_t max_len)
             struct stu_id *new_id = malloc(sizeof(struct stu_id));
             new_id->len = tlvs->len-1;
             new_id->id = malloc(tlvs->len);
-            strcpy(new_id->id, tlvs->val);
+            strcpy(new_id->id, (void *)tlvs->val);
             new_id->next = NULL;
             max_len -= tlvs->len + 2;
             tmpid->next = new_id;

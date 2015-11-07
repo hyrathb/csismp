@@ -1,0 +1,268 @@
+In file included from cssismp_send.c:2:0:
+cssismp_send.c: 在函数‘csismp_construct’中:
+In file included from cssismp_send.c:2:0:
+cssismp_send.c: 在函数‘csismp_construct’中:
+cssismp_send.c:34:10: 警告：传递‘ntoh’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+     hton((char *)csismp, 22 + len);
+          ^
+utils.h:22:30: 附注：in definition of macro ‘hton’
+ #define hton(dbuf, len) ntoh(dbuf, len)
+                              ^
+cssismp_send.c:34:10: 警告：传递‘ntoh’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+     hton((char *)csismp, 22 + len);
+          ^
+utils.h:22:30: 附注：in definition of macro ‘hton’
+ #define hton(dbuf, len) ntoh(dbuf, len)
+                              ^
+utils.h:30:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void ntoh(unsigned char *dbuf, size_t len);
+      ^
+utils.h:30:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void ntoh(unsigned char *dbuf, size_t len);
+      ^
+cssismp_send.c:22:9: 警告：未使用的变量‘i’ [-Wunused-variable]
+     int i;
+         ^
+cssismp_send.c:22:9: 警告：未使用的变量‘i’ [-Wunused-variable]
+     int i;
+         ^
+cssismp_send.c: 在函数‘_csismp_send’中:
+cssismp_send.c:75:61: 警告：建议在用作真值的赋值语句前后加上括号 [-Wparentheses]
+                     (struct sockaddr *) &sll ,sizeof(struct sockaddr_ll)) ==-1)
+                                                             ^
+cssismp_send.c: 在函数‘_csismp_send’中:
+cssismp_send.c:75:61: 警告：建议在用作真值的赋值语句前后加上括号 [-Wparentheses]
+                     (struct sockaddr *) &sll ,sizeof(struct sockaddr_ll)) ==-1)
+                                                             ^
+cssismp_send.c: 在函数‘csismp_send’中:
+cssismp_send.c:137:26: 警告：传递‘csismp_construct’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         csismp_construct(buffer, config_mac.mac_address, dest_addr,
+                          ^
+cssismp_send.c: 在函数‘csismp_send’中:
+cssismp_send.c:137:26: 警告：传递‘csismp_construct’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         csismp_construct(buffer, config_mac.mac_address, dest_addr,
+                          ^
+cssismp_send.c:8:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void csismp_construct(
+      ^
+cssismp_send.c:8:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void csismp_construct(
+      ^
+cssismp_send.c:137:34: 警告：传递‘csismp_construct’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         csismp_construct(buffer, config_mac.mac_address, dest_addr,
+                                  ^
+cssismp_send.c:137:34: 警告：传递‘csismp_construct’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         csismp_construct(buffer, config_mac.mac_address, dest_addr,
+                                  ^
+cssismp_send.c:8:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void csismp_construct(
+      ^
+cssismp_send.c:8:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void csismp_construct(
+      ^
+cssismp_send.c:161:30: 警告：传递‘csismp_construct’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+             csismp_construct(buffer, config_mac.mac_address, dest_addr, type, (s_num == 0), (left_length <= 0), s_num, session, "", 0);
+                              ^
+cssismp_send.c:8:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void csismp_construct(
+      ^
+cssismp_send.c:161:30: 警告：传递‘csismp_construct’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+             csismp_construct(buffer, config_mac.mac_address, dest_addr, type, (s_num == 0), (left_length <= 0), s_num, session, "", 0);
+                              ^
+cssismp_send.c:8:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void csismp_construct(
+      ^
+cssismp_send.c:161:38: 警告：传递‘csismp_construct’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+             csismp_construct(buffer, config_mac.mac_address, dest_addr, type, (s_num == 0), (left_length <= 0), s_num, session, "", 0);
+                                      ^
+cssismp_send.c:8:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void csismp_construct(
+      ^
+cssismp_send.c:161:38: 警告：传递‘csismp_construct’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+             csismp_construct(buffer, config_mac.mac_address, dest_addr, type, (s_num == 0), (left_length <= 0), s_num, session, "", 0);
+                                      ^
+cssismp_send.c:8:6: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ void csismp_construct(
+      ^
+handle_data.c: 在函数‘slice_handle’中:
+handle_data.c: 在函数‘slice_handle’中:
+handle_data.c:348:116: 警告：传递‘strcmp’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         else if (p_session->id == package.session&&p_session->type == package.type&&!strcmp(p_session->mac_address,package.smac))
+                                                                                                                    ^
+handle_data.c:348:116: 警告：传递‘strcmp’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         else if (p_session->id == package.session&&p_session->type == package.type&&!strcmp(p_session->mac_address,package.smac))
+                                                                                                                    ^
+In file included from handle_data.h:6:0,
+                 from handle_data.c:1:
+/usr/include/string.h:140:12: 附注：需要类型‘const char *’，但实参的类型为‘unsigned char *’
+ extern int strcmp (const char *__s1, const char *__s2)
+            ^
+In file included from handle_data.h:6:0,
+                 from handle_data.c:1:
+/usr/include/string.h:140:12: 附注：需要类型‘const char *’，但实参的类型为‘unsigned char *’
+ extern int strcmp (const char *__s1, const char *__s2)
+            ^
+handle_data.c: 在函数‘append_slice_to_session’中:
+handle_data.c:375:9: 警告：语句不起作用 [-Wunused-value]
+         package.sli_num == -1;
+         ^
+handle_data.c: 在函数‘append_slice_to_session’中:
+handle_data.c:375:9: 警告：语句不起作用 [-Wunused-value]
+         package.sli_num == -1;
+         ^
+handle_data.c: 在函数‘create_session_and_add_slice’中:
+handle_data.c:539:33: 警告：传递‘strcpy’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+     strcpy(ses_tmp->mac_address,package.smac);
+                                 ^
+handle_data.c: 在函数‘create_session_and_add_slice’中:
+handle_data.c:539:33: 警告：传递‘strcpy’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+     strcpy(ses_tmp->mac_address,package.smac);
+                                 ^
+In file included from handle_data.h:6:0,
+                 from handle_data.c:1:
+/usr/include/string.h:125:14: 附注：需要类型‘const char * restrict’，但实参的类型为‘unsigned char *’
+ extern char *strcpy (char *__restrict __dest, const char *__restrict __src)
+              ^
+In file included from handle_data.h:6:0,
+                 from handle_data.c:1:
+/usr/include/string.h:125:14: 附注：需要类型‘const char * restrict’，但实参的类型为‘unsigned char *’
+ extern char *strcpy (char *__restrict __dest, const char *__restrict __src)
+              ^
+handle_data.c: 在函数‘sync_school_info_in_memory’中:
+handle_data.c: 在函数‘sync_school_info_in_memory’中:
+handle_data.c:716:47: 警告：传递‘strcmp’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         if (!strcmp(sync_session->mac_address,other_stu_p->smac))
+                                               ^
+In file included from handle_data.h:6:0,
+                 from handle_data.c:1:
+/usr/include/string.h:140:12: 附注：需要类型‘const char *’，但实参的类型为‘unsigned char *’
+ extern int strcmp (const char *__s1, const char *__s2)
+            ^
+handle_data.c:716:47: 警告：传递‘strcmp’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         if (!strcmp(sync_session->mac_address,other_stu_p->smac))
+                                               ^
+In file included from handle_data.h:6:0,
+                 from handle_data.c:1:
+/usr/include/string.h:140:12: 附注：需要类型‘const char *’，但实参的类型为‘unsigned char *’
+ extern int strcmp (const char *__s1, const char *__s2)
+            ^
+handle_data.c:719:21: 警告：未使用的变量‘mem_stu’ [-Wunused-variable]
+             MEMBER* mem_stu = sync_session->member;
+                     ^
+handle_data.c:719:21: 警告：未使用的变量‘mem_stu’ [-Wunused-variable]
+             MEMBER* mem_stu = sync_session->member;
+                     ^
+handle_data.c:731:16: 警告：传递‘strcpy’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         strcpy(other_stu_p->smac,sync_session->mac_address);
+                ^
+handle_data.c:731:16: 警告：传递‘strcpy’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         strcpy(other_stu_p->smac,sync_session->mac_address);
+                ^
+In file included from handle_data.h:6:0,
+                 from handle_data.c:1:
+/usr/include/string.h:125:14: 附注：需要类型‘char * restrict’，但实参的类型为‘unsigned char *’
+ extern char *strcpy (char *__restrict __dest, const char *__restrict __src)
+              ^
+In file included from handle_data.h:6:0,
+                 from handle_data.c:1:
+/usr/include/string.h:125:14: 附注：需要类型‘char * restrict’，但实参的类型为‘unsigned char *’
+ extern char *strcpy (char *__restrict __dest, const char *__restrict __src)
+              ^
+main.c:6:5: 警告：‘main’的第二个参数类型应该是‘char **’ [-Wmain]
+ int main(int arg, char **argv[]){
+     ^
+main.c:6:5: 警告：‘main’的第二个参数类型应该是‘char **’ [-Wmain]
+ int main(int arg, char **argv[]){
+     ^
+main.c: 在函数‘main’中:
+main.c: 在函数‘main’中:
+main.c:46:14: 警告：未使用的变量‘session_p’ [-Wunused-variable]
+     SESSION* session_p = session_head;
+              ^
+main.c:46:14: 警告：未使用的变量‘session_p’ [-Wunused-variable]
+     SESSION* session_p = session_head;
+              ^
+parser.c: 在函数‘check_tlv’中:
+parser.c: 在函数‘check_tlv’中:
+parser.c:62:28: 警告：传递‘count’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+     if ((t->type) && count(t->val, t->len))
+                            ^
+parser.c:62:28: 警告：传递‘count’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+     if ((t->type) && count(t->val, t->len))
+                            ^
+parser.c:27:12: 附注：需要类型‘const unsigned char *’，但实参的类型为‘const char *’
+ static int count (const unsigned char *s, int elen)
+            ^
+parser.c:27:12: 附注：需要类型‘const unsigned char *’，但实参的类型为‘const char *’
+ static int count (const unsigned char *s, int elen)
+            ^
+thread.c: 在函数‘read_thread’中:
+thread.c: 在函数‘read_thread’中:
+thread.c:133:5: 警告：“/*”出现在注释中 [-Wcomment]
+     /*
+     ^
+thread.c:133:5: 警告：“/*”出现在注释中 [-Wcomment]
+     /*
+     ^
+thread.c:141:62: 警告：传递‘transform_mac_to_int64’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+     if (eth_type == 0x1122 && dmac == transform_mac_to_int64(config_mac.mac_address)){
+                                                              ^
+thread.c:141:62: 警告：传递‘transform_mac_to_int64’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+     if (eth_type == 0x1122 && dmac == transform_mac_to_int64(config_mac.mac_address)){
+                                                              ^
+In file included from thread.c:2:0:
+utils.h:36:10: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ uint64_t transform_mac_to_int64(unsigned char *mac);//char[6] to 0xFFFFFFFFFFFF
+          ^
+In file included from thread.c:2:0:
+utils.h:36:10: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ uint64_t transform_mac_to_int64(unsigned char *mac);//char[6] to 0xFFFFFFFFFFFF
+          ^
+thread.c:150:16: 警告：传递‘parser’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         parser(buffer_arg->buffer, buffer_arg->len);
+                ^
+thread.c:150:16: 警告：传递‘parser’的第 1 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         parser(buffer_arg->buffer, buffer_arg->len);
+                ^
+In file included from handle_data.h:9:0,
+                 from thread.c:3:
+parser.h:42:16: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ struct slice * parser(unsigned char *buf, size_t len);
+                ^
+In file included from handle_data.h:9:0,
+                 from thread.c:3:
+parser.h:42:16: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ struct slice * parser(unsigned char *buf, size_t len);
+                ^
+thread.c: 在函数‘p_sync_callback’中:
+thread.c: 在函数‘p_sync_callback’中:
+thread.c:199:34: 警告：传递‘csismp_send’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         csismp_send(send_socket, dmac->mac_address, 5, buffer, len);//!
+                                  ^
+thread.c:199:34: 警告：传递‘csismp_send’的第 2 个参数给指针时，目标与指针符号不一致 [-Wpointer-sign]
+         csismp_send(send_socket, dmac->mac_address, 5, buffer, len);//!
+                                  ^
+In file included from thread.c:5:0:
+cssismp_send.h:6:5: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ int csismp_send(int send_socket, unsigned char dest_addr[6], int type, char* tlvs, int s_len);
+     ^
+In file included from thread.c:5:0:
+cssismp_send.h:6:5: 附注：需要类型‘unsigned char *’，但实参的类型为‘char *’
+ int csismp_send(int send_socket, unsigned char dest_addr[6], int type, char* tlvs, int s_len);
+     ^
+thread.c: 在函数‘main_thread’中:
+thread.c: 在函数‘main_thread’中:
+thread.c:81:1: 警告：在有返回值的函数中，控制流程到达函数尾 [-Wreturn-type]
+ }
+ ^
+thread.c:81:1: 警告：在有返回值的函数中，控制流程到达函数尾 [-Wreturn-type]
+ }
+ ^
+thread.c: 在函数‘delay_thread’中:
+thread.c: 在函数‘delay_thread’中:
+thread.c:118:1: 警告：在有返回值的函数中，控制流程到达函数尾 [-Wreturn-type]
+ }
+ ^
+thread.c:118:1: 警告：在有返回值的函数中，控制流程到达函数尾 [-Wreturn-type]
+ }
+ ^

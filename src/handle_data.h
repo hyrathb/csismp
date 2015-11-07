@@ -6,14 +6,14 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include "../parser/parser.h"
+#include "parser.h"
 
 #define CONFIG_FILE "Config.txt"
 #define WRITE_CONFIG_FILE "CfgInfo.txt"
 #define DATA_FILE "StuInfo.txt"
 
 typedef struct mac{
-    char* mac_address;
+    unsigned char* mac_address;
     struct mac* next;
 }MAC;
 
@@ -33,7 +33,7 @@ typedef struct member
     {
         struct stu_full* content;
         struct stu_id *id_content;
-    };   
+    };
 }MEMBER;
 
 typedef struct other_academy

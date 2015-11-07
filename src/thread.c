@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "handle_data.h"
 #include "parser.h"
+#include "cssismp_send.h"
 
 pthread_rwlock_t rwlock; // Init Posix Read-write lock
 /*
@@ -24,11 +25,8 @@ MAC config_mac = { "\xff\xff\xff\xff\xff\xff", &listen_mac };
 
 int _csismp_send(int send_socket, const char *buffer, int len);
 
-
-
 int main_thread()
 {
-    //init
 
     int listen_socket;
     listen_socket = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
@@ -76,10 +74,12 @@ int main_thread()
     event_add(listen_event, NULL);
     pthread_t sync_tid, delay_tid;
     pthread_create(&sync_tid, NULL, sync_thread, NULL);
-    pthread_create(&delay_tid, NULL, delay_thread, arg);
+    pthread_create(&delay_tid, NULL, delay_thread, NULL);
 
     fprintf(stdout, "- START LISTENING -\n");
     event_base_dispatch(base);
+
+    return 0;
 }
 
 /***thread Funcs******************************************/
@@ -111,13 +111,14 @@ void *sync_thread(void *arg){
 
 void *delay_thread(void *arg){
     struct event_base *base = event_base_new();
-    event_add(listen_event, &delay_timer);
     struct timeval delay_timer={.tv_sec = 5, .tv_usec = 0};
     struct event delay_ev;
 
-    event_set(&delay_ev, 0, EV_PERSIST, somefunc, arg);
+    event_set(&delay_ev, 0, EV_PERSIST, NULL, NULL);
     event_base_set(base, &delay_ev);
     event_add(&delay_ev, &delay_timer);
+
+    return 0;
 }
 
 /*
@@ -133,13 +134,11 @@ void read_thread(void *arg){
 
 /*
     int i;
-    /*
     for ( i=0 ; i<buffer_arg->len ; i++){
         fprintf(stdout, "%.2X ",(unsigned char)buffer_arg->buffer[i]);
         if(((i+1)%16)==0) fprintf(stdout, "\n");
     }
-<<<<<<< HEAD
-    fprintf(stdout, "\n");
+
 */
     if (eth_type == 0x1122 && dmac == transform_mac_to_int64(config_mac.mac_address)){
 
@@ -154,6 +153,7 @@ void read_thread(void *arg){
 
         pthread_rwlock_unlock(&rwlock);    // Release Lock
     }
+    free(arg);
 }
 
 /***Registering Callbacks Funcs******************************************/
