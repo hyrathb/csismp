@@ -1,12 +1,11 @@
 #include "handle_data.h"
+#include "../utils.c"
 
 
 int main(void)
 {
     FILE *config,*data;
-    char config_file_path[]=CONFIG_FILE;
-    char data_file_path[]=DATA_FILE;
-    if(!(config = fopen(config_file_path,"r")))
+    if(!(config = fopen(CONFIG_FILE,"r")))
     {
         printf("error while reading config file\n");
         exit(-1);
@@ -22,19 +21,18 @@ int main(void)
         printf("error while reading config\n");
         exit(-1);
     }
+    fclose(config);
+    //here you should sort mac address!!!
+
 
     //this is the mac_address link test
-    MAC* test1 = mac_head->next;
-    printf("link test!\n");
-    while(test1!=NULL)
-    {
-        printf("mac address is %s\n",test1->mac_address );
-        mac_address_format_convert(test1->mac_address);
-        test1 = test1->next;
-    }
+    printf("%s\n",mac_head->next->next->next->mac_address );
+    //mac_p = mac_head->next->next;
+    //sort_mac_address(&mac_p);
+    //print_config_to_file(mac_head);
     //test end
 
-    if(!(data = fopen(data_file_path,"r+")))
+    if(!(data = fopen(DATA_FILE,"r+")))
     {
         printf("error while reading data file\n");
         exit(-1);
@@ -55,13 +53,6 @@ int main(void)
         printf("student info name is %s\n",test2->name);
         test2 = test2->next;
     }*/
-    //test end
-
-    //this is slice test
-    /*SLICE test3 = {
-        ADD,1,
-    }*/
-
     //test end
 
     //begin handle data(struct slice):
@@ -117,6 +108,35 @@ int read_config(FILE* config,MAC** link_mac_address)//todo:deal with wrong input
     return 1;
 }
 
+int print_config_to_file(MAC* mac_head)
+{
+    MAC* test1 = mac_head->next;
+    FILE* write_mac_config = fopen(WRITE_CONFIG_FILE,"w+");
+    printf("mac save test!\n");
+    for (int i = 1; test1!=NULL; ++i)
+    {
+        if (i == 1)
+        {
+            fprintf(write_mac_config,"local mac : %s\n",test1->mac_address );
+        }
+        else if (i == 2&&test1->next!=NULL)
+        {
+            fprintf(write_mac_config,"destination mac : %s\n", test1->mac_address);
+        }
+        else if(i == 2)
+        {
+            fprintf(write_mac_config,"destination mac : %s", test1->mac_address);
+        }
+        else if(test1->next!=NULL)
+            fprintf(write_mac_config,"                  %s\n", test1->mac_address);
+        else
+            fprintf(write_mac_config,"                  %s", test1->mac_address);
+        //mac_address_format_convert(test1->mac_address);
+        test1 = test1->next;
+    }
+    return 1;
+}
+
 /*function name:read_data_file
  *
  *to read Config.txt and get the local mac
@@ -166,7 +186,7 @@ int read_data_file(FILE* data_file,STUDENT_INFO** link_student_info)
  *to store destination mac address to a 
  *created link
  */
-int store_mac_address(char* mac_address, MAC** link_mac_address)
+int store_mac_address(char* mac_address,MAC** link_mac_address)
 {
     int address_length = strlen(mac_address);
     MAC* tmp_p = *link_mac_address;
@@ -178,6 +198,41 @@ int store_mac_address(char* mac_address, MAC** link_mac_address)
     strcpy(tmp_p->mac_address,mac_address);
     (*link_mac_address)->next = tmp_p;
     *link_mac_address=(*link_mac_address)->next;
+    return 1;
+}
+
+int sort_mac_address(MAC** link_mac_address)
+{
+    MAC* tmp_head = *link_mac_address;
+    MAC* tmp_p;
+    while(tmp_head!=NULL)
+    {
+        for (tmp_p = tmp_head;strcmp(tmp_p->mac_address,tmp_head->mac_address)>=0;tmp_p = tmp_p->next)
+        {
+            printf("tmp_head->mac_address %s\n",tmp_head->mac_address );
+        printf("tmp_p->mac_address %s\n",tmp_p->mac_address );
+            if (tmp_p->next==NULL)
+            {
+                break;
+            }
+        }
+        if (tmp_p->next == NULL&&strcmp(tmp_p->mac_address,tmp_head->mac_address)>=0)
+        {
+            printf("loop end\n");;
+        }
+        else{
+            char char_tmp[20];
+            printf("!!!!!!tmp_head->mac_address %s\n",tmp_head->mac_address );
+            printf("!!!!!!tmp_p->mac_address %s\n",tmp_p->mac_address );
+            strcpy(char_tmp,tmp_head->mac_address);
+            strcpy(tmp_head->mac_address,tmp_p->mac_address);
+            strcpy(tmp_p->mac_address,char_tmp);
+        }
+        
+
+        tmp_head = tmp_head->next;
+    }
+
     return 1;
 }
 
@@ -502,12 +557,42 @@ int deal_session_in_student_info(SESSION** current_node,STUDENT_INFO** link_stud
     else if(type == ADD )
     {
         STUDENT_INFO* stu_node = (STUDENT_INFO*)malloc(sizeof(*stu_node));
+        int judge_existence = 0;
         while(mem_tmp!=NULL)
         {
+            
+            
             if (mem_tmp->content->type == ID)
             {
-                stu_node->id = (char*)malloc(strlen(mem_tmp->content->content));
-                strcpy(stu_node->id,mem_tmp->content->content);
+                STUDENT_INFO* loop_head = *link_student_info;
+                for (; loop_head!=NULL; loop_head = loop_head->next)
+                {                
+                    if (!strcmp(mem_tmp->content->content,loop_head->id))
+                    {
+                        judge_existence = 1;
+                        break;
+                    }
+                }
+                if (judge_existence == 0)
+                {
+                    stu_node->id = (char*)malloc(strlen(mem_tmp->content->content));
+                    strcpy(stu_node->id,mem_tmp->content->content);
+                }
+                else
+                {
+                    if (!strcmp(mem_tmp->next->content->content,loop_head->name)&&!\
+                        strcmp(mem_tmp->next->next->content->content,loop_head->faculty))
+                    {
+                        mem_tmp = mem_tmp->next->next;
+                        judge_existence = 0;
+                    }
+                    else
+                    {
+                        stu_node->id = (char*)malloc(strlen(mem_tmp->content->content));
+                        strcpy(stu_node->id,mem_tmp->content->content);
+                    }
+                    
+                }                
             }
             else
                 if (mem_tmp->content->type == NAME)
@@ -522,8 +607,11 @@ int deal_session_in_student_info(SESSION** current_node,STUDENT_INFO** link_stud
                         strcpy(stu_node->faculty,mem_tmp->content->content);
                         store_student_info(stu_node->faculty,stu_node->id,stu_node->name,link_student_info);
                         printf("stored success!\n");
-                    }       
+                    }
+            mem_tmp = mem_tmp->next;       
         }
+        
+        return 1;
         
         return 1;
     }
