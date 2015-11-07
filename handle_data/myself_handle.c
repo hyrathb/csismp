@@ -75,6 +75,7 @@ int main(void)
     SESSION* session_head = (SESSION*)malloc(sizeof(*session_head));
     session_head->next = NULL;
     SESSION* session_p = session_head;
+     
 
 
 
@@ -164,12 +165,13 @@ int print_config_to_file(MAC* mac_head)
  */
 int read_data_file(FILE* data_file,STUDENT_INFO** link_student_info)
 {
-    char a_line[81];
+    char a_line[100];
     char is_newline = 'n';
     char apart1[33];
     while(!feof(data_file))
     {
-        fgets(a_line,81,data_file);
+        fgets(a_line,100,data_file);
+        printf("the line is %s!\n",a_line);
         if (a_line[34]=='\n'||a_line[33]=='\n'||a_line[33]=='\r')                    //a_line[33]='\r',a_line[34]='\n'
         {
             is_newline = 'y';
@@ -187,11 +189,13 @@ int read_data_file(FILE* data_file,STUDENT_INFO** link_student_info)
                 store_student_info(join(apart1,apart2),student_id,name,link_student_info);
                 is_newline = 'n';
             }
-            else if (a_line[0]!='-'&&is_newline=='n'&&!strstr(a_line,"Faculty")&&!strstr(a_line,"Time"))
+            else if (a_line[0]!='-'&&is_newline=='n'&&strstr(a_line,"Faculty")==NULL&&strstr(a_line,"Time")==NULL&&a_line[0]!=' ')
                 {
-                    char apart2[34],student_id[11],name[20];
+                    char apart2[34],student_id[12],name[21];
                     sscanf(a_line,"%33c %[a-zA-Z0-9] %[a-zA-Z ]",apart2,student_id,name);
                     apart2[33] = '\0';
+                    student_id[11] = '\0';
+                    name[20] = '\0';
                     store_student_info(apart2,student_id,name,link_student_info);
                     printf("handle once\n");
                     printf("%s\n",apart2 );
