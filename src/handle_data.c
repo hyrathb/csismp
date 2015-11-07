@@ -1,6 +1,4 @@
 #include "handle_data.h"
-#include "../utils.c"
-#include "../async/thread.h"
 
 
 

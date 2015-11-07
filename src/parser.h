@@ -9,7 +9,7 @@ struct tlv
 {
     char type;
     unsigned char len;
-    char val[0];
+    unsigned char val[0];
 };
 
 #pragma pack(2)

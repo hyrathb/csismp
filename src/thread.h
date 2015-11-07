@@ -26,15 +26,16 @@
 
 
 int main_thread();
+void *sync_thread(void *arg);
+void *delay_thread(void *arg);
 
 struct read_callback_buffer{
-    char buffer[BUFFER_MAX];
+    unsigned char buffer[BUFFER_MAX];
     int len;
 };
 
 void p_read_callback(int sock, short event, void *arg);
 void p_sync_callback(int send_socket, short event, void *arg);
 void p_reply(unsigned char dest_addr[6], int type);
-void *sync_thread(void *arg);
 
 #endif
