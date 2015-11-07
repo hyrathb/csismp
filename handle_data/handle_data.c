@@ -363,7 +363,7 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info)
             }
             else
             {
-                store_session_into_student_info(current_node,link_student_info,DEL);
+                deal_session_in_student_info(current_node,link_student_info,DEL);
                 free_session(current_node);
                 return 1;
             }
@@ -385,7 +385,7 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info)
                     return 0;
                 }
             }
-            store_session_into_student_info(current_node,link_student_info,DEL);
+            deal_session_in_student_info(current_node,link_student_info,DEL);
             free_session(current_node);
             return 1;
         }
@@ -416,7 +416,7 @@ int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info)
                     return 0;
                 }
             }
-            store_session_into_student_info(current_node,link_student_info,session_head->type);
+            deal_session_in_student_info(current_node,link_student_info,session_head->type);
             free_session(current_node);
             return 1;
         }
@@ -460,9 +460,121 @@ int free_session(SESSION**current_node)
     return 1;
 }
 
-int store_session_into_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,enum P_TYPE type)
+int deal_session_in_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,enum P_TYPE type)
 {
-    return 1;
+    STUDENT_INFO* stu_tmp = *link_student_info;
+    STUDENT_INFO* iter_tmp = stu_tmp;
+    MEMBER* mem_tmp = (*current_node)->member;
+    if (type == DEL)
+    {
+        MEMBER* mem_test = mem_tmp;
+        STUDENT_INFO* stu_test = stu_tmp;
+        while(stu_test!=NULL&&mem_test!=NULL)
+        {
+            if (strcmp(stu_test->id,mem_test->id_content->id))
+            {
+                stu_test = stu_test->next;
+            }
+            else
+                mem_test = mem_test->next;
+        }
+        if (mem_test!=NULL)
+        {
+            printf("DEL package wrong!\n");
+            return 0;
+        }
+        while(mem_tmp!=NULL&&iter_tmp!=NULL)
+        {
+            if (strcmp(iter_tmp->id,mem_tmp->id_content->id))
+            {
+                iter_tmp = iter_tmp->next;
+            }
+            else
+            {
+                free(iter_tmp);
+                iter_tmp = iter_tmp->next;
+                mem_tmp = mem_tmp->next;
+            }
+        }
+        *link_student_info = stu_tmp;
+        return 1;
+    }
+    else if(type == ADD )
+    {
+        STUDENT_INFO* stu_node = (STUDENT_INFO*)malloc(sizeof(*stu_node));
+        while(mem_tmp!=NULL)
+        {
+            if (mem_tmp->content->type == ID)
+            {
+                stu_node->id = (char*)malloc(strlen(mem_tmp->content->content));
+                strcpy(stu_node->id,mem_tmp->content->content);
+            }
+            else
+                if (mem_tmp->content->type == NAME)
+                {
+                    stu_node->name = (char*)malloc(strlen(mem_tmp->content->content));
+                    strcpy(stu_node->name,mem_tmp->content->content);
+                }
+                else
+                    if (mem_tmp->content->type == ACADEMY)
+                    {
+                        stu_node->faculty = (char*)malloc(strlen(mem_tmp->content->content));
+                        strcpy(stu_node->faculty,mem_tmp->content->content);
+                        store_student_info(stu_node->faculty,stu_node->id,stu_node->name,link_student_info);
+                        printf("stored success!\n");
+                    }       
+        }
+        
+        return 1;
+    }
+    else if(type == SYN)
+    {
+        STUDENT_INFO* stu_node = (STUDENT_INFO*)malloc(sizeof(*stu_node));
+        int judge_existence = 0;
+        while(mem_tmp!=NULL)
+        {
+            
+            
+            if (mem_tmp->content->type == ID)
+            {
+                for (STUDENT_INFO* loop_head = *link_student_info; loop_head!=NULL; loop_head = loop_head->next)
+                {                
+                    if (!strcmp(mem_tmp->content->content,loop_head->id))
+                    {
+                        judge_existence = 1;
+                    }
+                }
+                if (judge_existence == 0)
+                {
+                    stu_node->id = (char*)malloc(strlen(mem_tmp->content->content));
+                    strcpy(stu_node->id,mem_tmp->content->content);
+                }
+                else
+                {
+                    mem_tmp = mem_tmp->next->next;
+                    judge_existence = 0;
+                }                
+            }
+            else
+                if (mem_tmp->content->type == NAME)
+                {
+                    stu_node->name = (char*)malloc(strlen(mem_tmp->content->content));
+                    strcpy(stu_node->name,mem_tmp->content->content);
+                }
+                else
+                    if (mem_tmp->content->type == ACADEMY)
+                    {
+                        stu_node->faculty = (char*)malloc(strlen(mem_tmp->content->content));
+                        strcpy(stu_node->faculty,mem_tmp->content->content);
+                        store_student_info(stu_node->faculty,stu_node->id,stu_node->name,link_student_info);
+                        printf("stored success!\n");
+                    }
+            mem_tmp = mem_tmp->next;       
+        }
+        
+        return 1;
+    }
+    return 0;
 }
 
 /*

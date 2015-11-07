@@ -97,6 +97,7 @@ typedef struct member
 typedef struct session
 {
     int id;
+    int amount;
     enum P_TYPE type;
     time_t first_time;
     char mac_address[6];
@@ -116,7 +117,7 @@ char* mac_address_format_convert(char* config_format);
 int append_slice_to_session(SESSION** current_node,SLICE package,enum  P_TYPE type);
 int handle_session(SESSION** current_node,STUDENT_INFO** link_student_info);
 int free_session(SESSION**current_node);
-int store_session_into_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,enum P_TYPE type);
+int deal_session_in_student_info(SESSION** current_node,STUDENT_INFO** link_student_info,enum P_TYPE type);
 int slice_handle(SLICE package,SESSION** data_session,STUDENT_INFO** link_student_info);
 int create_session_and_add_slice(SESSION** current_node,SLICE package,enum  P_TYPE type);
 #endif
