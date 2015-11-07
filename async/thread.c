@@ -22,10 +22,10 @@ typedef struct mac{
 }MAC;
 
 */
-MAC listen_mac = { "\xcc\xcc\xcc\xcc\xcc\xcc", NULL };
-MAC config_mac = { "\xaa\xbb\xcc\xdd\xdd\xde", &listen_mac };
+MAC listen_mac = { "\xff\xff\xff\xff\xff\xff", NULL };
+MAC config_mac = { "\xff\xff\xff\xff\xff\xff", &listen_mac };
 
-#define INTERFACE_NAME "lo"
+#define INTERFACE_NAME "enp4s0f1"
 
 int _csismp_send(int send_socket, const char *buffer, int len);
 
@@ -38,7 +38,6 @@ int main(int argc, char **argv[])
         fprintf(stderr ,"Failed to create socket\n");
         exit(-1);
     }
-
     /*bind and set listen_sock*/
     struct ifreq ifr;
 
@@ -89,6 +88,7 @@ int main(int argc, char **argv[])
     new thread to set a timer for synchronization event every 30 second.
     call p_sync_callback()
  */
+
 void *sync_thread(void *arg){
     fprintf(stdout, "- sync_thread -\n");
     struct event_base *base = event_base_new();
@@ -103,7 +103,7 @@ void *sync_thread(void *arg){
     }
 
 
-    event_set(&sync_ev, send_socket, EV_PERSIST, p_sync_callback, &rsync_info);//!
+    event_set(&sync_ev, send_socket, EV_PERSIST, p_sync_callback, NULL);
     event_base_set(base, &sync_ev);
     event_add(&sync_ev, &timer);
 
@@ -116,32 +116,34 @@ void *sync_thread(void *arg){
     analyze its header and send package to parser();
  */
 void read_thread(void *arg){
-
     struct read_callback_buffer *buffer_arg = (struct read_callback_buffer *)arg;
 
-    uint64_t smac = transform_mac_to_int64((char *) (buffer_arg->buffer + 6) );
+    uint64_t dmac = transform_mac_to_int64((unsigned char *) (buffer_arg->buffer) );
     uint16_t eth_type = ((uint16_t)buffer_arg->buffer[12]) << 8 | (uint16_t)buffer_arg->buffer[13];
+    pthread_rwlock_rdlock(&rwlock);    // Lock
 
+/*
     int i;
     for ( i=0 ; i<buffer_arg->len ; i++){
-        printf("%.2X ",(unsigned char)buffer_arg->buffer[i]);
-        if(((i+1)%16)==0) printf("\n");
+        fprintf(stdout, "%.2X ",(unsigned char)buffer_arg->buffer[i]);
+        if(((i+1)%16)==0) fprintf(stdout, "\n");
     }
+    fprintf(stdout, "\n");
+*/
 
-    if (eth_type == 0x1122 /*&& smac == transform_mac_to_int64(config_mac.mac_address)*/ ){
+    if (eth_type == 0x1122 && dmac == transform_mac_to_int64(config_mac.mac_address)){
 
 
-
-    printf("gegegegegegegege a packet 0x1122\n");
+    fprintf(stdout, "gegegegegegegege a packet 0x1122\n");
 /*
     pthread_rwlock_rdlock(&rwlock);    // Lock
     pthread_rwlock_unlock(&rwlock);    // Release Lock
 */
-
-
         //TO HYR
-        printf("- REALLY TO HYR TO HYR!-");
+        fprintf(stdout, "- REALLY TO HYR TO HYR!-\n");
         parser(buffer_arg->buffer, buffer_arg->len);
+
+        pthread_rwlock_unlock(&rwlock);    // Release Lock
     }
 }
 
@@ -152,17 +154,16 @@ void read_thread(void *arg){
     recv data to read_thread();
  */
 void p_read_callback(int sock, short event, void *arg){
-    printf("-RECIVED PACKET-\n");
+//  printf("-RECIVED PACKET-\n");
 
     char buffer[BUFFER_MAX];
     int len;
 
     len = recvfrom(sock, buffer, BUFFER_MAX, 0, NULL, NULL);
 
-    printf("length : %d\n", len);
+//  printf("length : %d\n", len);
     if(len < 23)
         return;
-
 
     struct read_callback_buffer *buffer_arg = malloc( sizeof (struct read_callback_buffer) );
     memcpy(buffer_arg->buffer, buffer, len);
@@ -170,6 +171,7 @@ void p_read_callback(int sock, short event, void *arg){
 
     pthread_t sync_tid;
     pthread_create(&sync_tid, NULL, (void * (*)(void *))&read_thread, buffer_arg);
+
 }
 
 /*
@@ -185,11 +187,12 @@ void p_sync_callback(int send_socket, short event, void *arg){
     int len = generate_tlvs(buffer);
 
     MAC *dmac = config_mac.next;
-
     for ( ; dmac != NULL ; dmac = dmac->next)
     {
         csismp_send(send_socket, dmac->mac_address, 5, buffer, len);//!
     }
+
+    free(buffer);
 //!
 }
 
@@ -218,6 +221,10 @@ void print_time(){
     time(&timep);
     fprintf(stdout, "%s", ctime(&timep));
 }
+
+
+
+
 
 
 
