@@ -2,6 +2,10 @@
 #define UTILS_H
 
 #include <stdlib.h>
+#include <stdint.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+
 
 #define ntoh_2bytes(buf) ntoh_nbytes(buf, 2, 0)
 #define ntoh_4bytes(buf) ntoh_nbytes(buf, 4, 0)
@@ -27,12 +31,10 @@ char *get_interface_name();
 
 char *format_mac(char *mac);
 
-uint64_t transform_mac_to_int64(char *mac);
+uint64_t transform_mac_to_int64(unsigned char *mac);
 
 char* mac_upper(const char *str);
 
 char *format(char *mac);
-
-uint64_t transform_mac_to_int64(char *smac);
 
 #endif

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 
+#include <time.h>
 
 #define BUFFER_MAX 1049
 
@@ -58,13 +59,13 @@ struct read_callback_buffer{
     int len;
 };
 
+
+void print_time();
+
 void p_read_callback(int sock, short event, void *arg);
 void p_sync_callback(int send_socket, short event, void *arg);
 void p_reply(char dest_addr[6], int type);
 void *sync_thread(void *arg);
 int csismp_send(int send_socket, char dest_addr[6], int type, char* tlvs, int s_len);
-
-
-
 
 #endif

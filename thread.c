@@ -16,6 +16,8 @@ typedef struct student_info{
 MAC config_mac;
 
 
+#define INTERFACE_NAME "enp4s0f1"
+
 int _csismp_send(int send_socket, const char *buffer, int len);
 
 int main(int argc, char **argv[])
@@ -30,20 +32,12 @@ int main(int argc, char **argv[])
     }
 
     struct ifreq ifr;
-    /*
-    struct ifaddrs *ifaddr;
-    getifaddrs(&ifap);
-    char *ip = inet_ntoa(((struct sockaddr_in *)ifap->ifa_addr)->sin-addr);
-    if (ioctl(listen_socket, SIOCGIFINDEX, &ifr) == -1){
-        fprintf(stderr, "Unable to find intreface index : %s\n", strerror(errno));
-        exit(-1);
-    }
-    char *a = get_interface_name();
-    printf("%s", a);*/
 
-
-    //strcpy(ifr.ifr_name, get_interface_name());
-    strcpy(ifr.ifr_name, "enp4s0f1");
+#ifdef INTERFACE_NAME
+    strcpy(ifr.ifr_name, INTERFACE_NAME);
+#else
+    strcpy(ifr.ifr_name, get_interface_name());
+#endif
 
     if (ioctl(listen_socket, SIOCGIFINDEX, &ifr) == -1) {
         fprintf(stderr ,"ioctl error,no such interface\n");
@@ -66,28 +60,6 @@ int main(int argc, char **argv[])
         fprintf(stderr ,"bind error\n");
         exit(-1);
     }
-
-/*
-    int a, i;
-    char buffer[BUFFER_MAX];
-    while(1)
-    {
-        printf("recvfrom\n");
-        a = recvfrom(listen_socket, buffer, BUFFER_MAX, 0, NULL, NULL);
-        for ( i=0 ; i < a ; i++)
-            printf("%.2X ",(unsigned char)buffer[i]);
-            if(((i+1)%16)==0) printf("\n");
-    }
-    //test
-*//*
-    char dest_addr[6];
-    dest_addr[0] = dest_addr[1] = dest_addr[2] = dest_addr[3] = dest_addr[4] = dest_addr[5] = 0xFF;
-    rsync_info.local_mac = malloc(sizeof( char) * 6);
-    rsync_info.local_mac[0] = rsync_info.local_mac[1] =rsync_info.local_mac[2] = rsync_info.local_mac[3] = rsync_info.local_mac[4] = rsync_info.local_mac[5] = 0xFF;
-    printf("start reply()\n");
-    p_reply(dest_addr, 3);
-    printf("end reply()\n");
-//    //test*/
 
     struct event_base *base = event_base_new();
     struct event *listen_event;
@@ -145,7 +117,6 @@ void read_thread(void *arg){
 /******************************/
 
 void p_read_callback(int sock, short event, void *arg){
-
     printf("-RECIVED PACKET-\n");
 
     char buffer[BUFFER_MAX];
@@ -166,10 +137,12 @@ void p_read_callback(int sock, short event, void *arg){
 }
 
 int generate_tlvs(void *);
-
 //!
+
+
 void p_sync_callback(int send_socket, short event, void *arg){
-    fprintf(stdout, "- A SYNC START -\n");
+    print_time();
+    fprintf(stdout, "- START SYNC START -\n");
 
     //MAC *mac = &;
     char buffer[BUFFER_MAX * 8];
@@ -182,7 +155,6 @@ void p_sync_callback(int send_socket, short event, void *arg){
         csismp_send(send_socket, dmac->mac_address, 5, buffer, len);//!
     }
 //!
-    fprintf(stdout, "- A SYNC END -\n");
 }
 
 void p_reply(char dest_addr[6], int type){
@@ -299,3 +271,13 @@ int csismp_send(int send_socket, char dest_addr[6], int type, char* tlvs, int s_
         }
     }
 }
+
+void print_time(){
+    time_t timep;
+    time(&timep);
+    fprintf(stdout, "%s", ctime(&timep));
+}
+
+
+
+

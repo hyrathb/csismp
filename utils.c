@@ -119,7 +119,6 @@ uint64_t transform_mac_to_int64(unsigned char *mac){ //char[6] to 0xFFFFFFFFFFFF
 
 char* mac_upper(const char *str){
     char *buffer = malloc(strlen(str));
-
     int i;
     for ( i = 0 ; *(str + i) != '\0' ; ++i ){
         if ( *(str + i) < 'z' && *(str + i) > 'a')
