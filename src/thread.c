@@ -114,7 +114,11 @@ void *delay_thread(void *arg){
     session_p = session_head;
     info_p = info_head;
     academy_p = academy_head;
-    event_set(&delay_ev, 0, EV_PERSIST, deal_session_in_student_info(&session_p,info_p,ADD,academy_p), NULL); //TODO
+    int (*pfun)(SESSION** current_node,STUDENT_INFO** link_student_info,\
+    enum P_TYPE type,OTHER_ACADEMY** other_stu_info);
+    pfun = &deal_session_in_student_info;
+    (*pfun)(&session_p,&info_p,ADD,&academy_p);
+    event_set(&delay_ev, 0, EV_PERSIST, pfun/*deal_session_in_student_info(&session_p,&info_p,ADD,&academy_p)*/, NULL); //TODO
     event_base_set(base, &delay_ev);
     event_add(&delay_ev, &delay_timer);
 

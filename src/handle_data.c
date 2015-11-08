@@ -276,6 +276,11 @@ int slice_handle(SLICE *package,SESSION** data_session,STUDENT_INFO** link_stude
 {
     SESSION *p_session = *data_session;
     int judge_return = 0;
+    if (package == NULL)
+    {
+    	p_reply(p_session->mac_address,4);
+    	return 0;
+    }
     while(p_session!=NULL)
     {
         if (is_time_expire(p_session->first_time,package->timestamp))
