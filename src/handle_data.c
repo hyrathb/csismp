@@ -72,6 +72,7 @@ int print_config_to_file(MAC* mac_head)
         //mac_address_format_convert(test1->mac_address);
         test1 = test1->next;
     }
+    fclose(write_mac_config);
     return 1;
 }
 
